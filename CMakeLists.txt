@@ -24,3 +24,6 @@ include_directories(
 add_library(rosban_gp
   src/rosban_gp/multivariate_gaussian.cpp
 )
+
+add_executable(2.9.1 src/exercises/2.9.1.cpp)
+target_link_libraries(2.9.1 rosban_gp)

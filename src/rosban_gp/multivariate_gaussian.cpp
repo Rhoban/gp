@@ -31,7 +31,10 @@ void MultiVariateGaussian::updateCholesky()
 {
   //WARNING: according to Rasmussen 2006, it might be necessary to add epsilon * I
   //         before computing cholesky
-  cholesky = Eigen::LLT<Eigen::MatrixXd>(sigma).matrixL();
+  double epsilon = std::pow(10, -6);
+  Eigen::MatrixXd I;
+  I = Eigen::MatrixXd::Identity(sigma.rows(), sigma.rows());
+  cholesky = Eigen::LLT<Eigen::MatrixXd>(sigma + epsilon * I).matrixL();
 }
 
 }

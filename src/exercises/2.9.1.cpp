@@ -24,7 +24,7 @@ Eigen::MatrixXd buildCovarianceMatrix(const Eigen::MatrixXd & inputs,
   Eigen::MatrixXd result(nb_points, nb_points);
   for (int p1 = 0; p1 < nb_points; p1++)
   {
-    for (int p2 = p1+1; p2 < nb_points; p2++)
+    for (int p2 = p1; p2 < nb_points; p2++)
     {
       double value = covar_func(inputs.col(p1), inputs.col(p2));
       result(p1,p2) = value;
@@ -41,7 +41,7 @@ int main(int argc, char ** argv)
   limits(0,0) = -5;
   limits(0,1) = 5;
   // Parameters
-  int nb_points = 5000;
+  int nb_points = 1000;
   int nb_func = 3;
 
   // Generating input
@@ -74,7 +74,7 @@ int main(int argc, char ** argv)
     Eigen::VectorXd func_values = distrib.getSample(engine);
     for (int i = 0; i < nb_points; i++)
     {
-      std::cout << func_id << "," << input(0,i) << "," << func_values(i) << std::endl;
+      std::cout << "f" << func_id << "," << input(0,i) << "," << func_values(i) << std::endl;
     }
   }
 }

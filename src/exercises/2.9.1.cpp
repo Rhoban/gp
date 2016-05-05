@@ -1,37 +1,17 @@
 #include "rosban_gp/multivariate_gaussian.h"
+#include "rosban_gp/tools.h"
+#include "rosban_gp/core/gaussian_process.h"
 
 #include <functional>
-#include <iostream>
+#include <fstream>
 #include <chrono>
 
 using rosban_gp::MultiVariateGaussian;
-
-typedef std::function<double(const Eigen::VectorXd &, const Eigen::VectorXd &)> CovarianceFunction;
 
 std::default_random_engine get_random_engine()
 {
   unsigned long seed = std::chrono::system_clock::now().time_since_epoch().count();
   return std::default_random_engine(seed);
-}
-
-/// for inputs
-/// - each row is a different dimension
-/// - each col is a different point
-Eigen::MatrixXd buildCovarianceMatrix(const Eigen::MatrixXd & inputs,
-                                      CovarianceFunction covar_func)
-{
-  int nb_points = inputs.cols();
-  Eigen::MatrixXd result(nb_points, nb_points);
-  for (int p1 = 0; p1 < nb_points; p1++)
-  {
-    for (int p2 = p1; p2 < nb_points; p2++)
-    {
-      double value = covar_func(inputs.col(p1), inputs.col(p2));
-      result(p1,p2) = value;
-      result(p2,p1) = value;
-    }
-  }
-  return result;
 }
 
 int main(int argc, char ** argv)
@@ -54,27 +34,56 @@ int main(int argc, char ** argv)
     x += x_step;
   }
 
+  rosban_gp::CovarianceFunction covar_func = [](const Eigen::VectorXd & p1,
+                                                const Eigen::VectorXd & p2)
+    {
+      double norm2 = (p1 - p2).squaredNorm();
+      return std::exp(-0.5 * norm2);
+    };
+
   Eigen::VectorXd mu = Eigen::VectorXd::Zero(nb_points);
-  Eigen::MatrixXd sigma = buildCovarianceMatrix(input,
-                                                [](const Eigen::VectorXd & p1,
-                                                   const Eigen::VectorXd & p2)
-                                                {
-                                                  double norm2 = (p1 - p2).squaredNorm();
-                                                  return std::exp(-0.5 * norm2);
-                                                }
-    );
+  Eigen::MatrixXd sigma = rosban_gp::buildCovarianceMatrix(input, covar_func);
 
   std::default_random_engine engine = get_random_engine();
   MultiVariateGaussian distrib(mu, sigma);
 
-  std::cout << "func,input,output" << std::endl;
+  std::ofstream prior_out, posterior_out;
+
+  prior_out.open("prior.csv");
+  posterior_out.open("posterior.csv");
+
+  prior_out << "func,input,output" << std::endl;
 
   for (int func_id = 1; func_id <= nb_func; func_id++)
   {
     Eigen::VectorXd func_values = distrib.getSample(engine);
     for (int i = 0; i < nb_points; i++)
     {
-      std::cout << "f" << func_id << "," << input(0,i) << "," << func_values(i) << std::endl;
+      prior_out << "f" << func_id << "," << input(0,i) << "," << func_values(i) << std::endl;
     }
   }
+
+  prior_out.close();
+
+  Eigen::MatrixXd samples(1,5);
+  Eigen::VectorXd observations(5);
+
+  samples << -4, -3, 0, 2, 3;
+  observations << -1.5, -1, 1, 0.5, 0;
+
+  rosban_gp::GaussianProcess gp(samples, observations, covar_func);
+
+
+  posterior_out << "func,input,output" << std::endl;
+
+  for (int func_id = 1; func_id <= nb_func; func_id++)
+  {
+    Eigen::VectorXd func_values = gp.generateValues(input, engine);
+    for (int i = 0; i < nb_points; i++)
+    {
+      posterior_out << "f" << func_id << "," << input(0,i) << "," << func_values(i) << std::endl;
+    }
+  }
+
+  posterior_out.close();
 }

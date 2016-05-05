@@ -23,6 +23,8 @@ include_directories(
 # Declare a C++ library
 add_library(rosban_gp
   src/rosban_gp/multivariate_gaussian.cpp
+  src/rosban_gp/tools.cpp
+  src/rosban_gp/core/gaussian_process.cpp
 )
 
 add_executable(2.9.1 src/exercises/2.9.1.cpp)

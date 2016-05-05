@@ -22,7 +22,7 @@ int main(int argc, char ** argv)
   limits(0,1) = 5;
   // Parameters
   int nb_points = 1000;
-  int nb_func = 3;
+  int nb_func = 5;
 
   // Generating input
   Eigen::MatrixXd input(1, nb_points);
@@ -47,13 +47,19 @@ int main(int argc, char ** argv)
   std::default_random_engine engine = get_random_engine();
   MultiVariateGaussian distrib(mu, sigma);
 
-  std::ofstream prior_out, posterior_out;
+  // Samples used
+  Eigen::MatrixXd samples(1,5);
+  Eigen::VectorXd observations(5);
+  samples << -4, -3, 0, 2, 3;
+  observations << -1.5, -1, 1, 0.5, 0;
 
+  rosban_gp::GaussianProcess gp(samples, observations, covar_func);
+
+  std::ofstream prior_out, posterior_out, prediction_out;
+
+  // PRIOR
   prior_out.open("prior.csv");
-  posterior_out.open("posterior.csv");
-
   prior_out << "func,input,output" << std::endl;
-
   for (int func_id = 1; func_id <= nb_func; func_id++)
   {
     Eigen::VectorXd func_values = distrib.getSample(engine);
@@ -62,20 +68,11 @@ int main(int argc, char ** argv)
       prior_out << "f" << func_id << "," << input(0,i) << "," << func_values(i) << std::endl;
     }
   }
-
   prior_out.close();
 
-  Eigen::MatrixXd samples(1,5);
-  Eigen::VectorXd observations(5);
-
-  samples << -4, -3, 0, 2, 3;
-  observations << -1.5, -1, 1, 0.5, 0;
-
-  rosban_gp::GaussianProcess gp(samples, observations, covar_func);
-
-
+  // POSTERIOR
+  posterior_out.open("posterior.csv");
   posterior_out << "func,input,output" << std::endl;
-
   for (int func_id = 1; func_id <= nb_func; func_id++)
   {
     Eigen::VectorXd func_values = gp.generateValues(input, engine);
@@ -84,6 +81,23 @@ int main(int argc, char ** argv)
       posterior_out << "f" << func_id << "," << input(0,i) << "," << func_values(i) << std::endl;
     }
   }
-
   posterior_out.close();
+
+  // PREDICTION
+  prediction_out.open("prediction.csv");
+  prediction_out << "input,mean,min,max" << std::endl;
+  for (int func_id = 1; func_id <= nb_func; func_id++)
+  {
+    for (int i = 0; i < nb_points; i++)
+    {
+      double mean, var;
+      gp.getDistribParameters(input.col(i), mean, var);
+      double interval = 2 * std::sqrt(var);
+      double min = mean - interval;
+      double max = mean + interval;
+      prediction_out << input(0,i) << "," << mean << "," << min << "," << max << std::endl;
+    }
+  }
+  prediction_out.close();
+
 }

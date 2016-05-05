@@ -19,6 +19,17 @@ public:
                   const Eigen::VectorXd & observations,
                   CovarianceFunction covar_func);
 
+  /// Return a prediction of the value at the given point
+  double getPrediction(const Eigen::VectorXd & point);
+  /// Return an estimation of the variance at the given point
+  double getVariance(const Eigen::VectorXd & point);
+
+  /// Compute the parameters of the distribution at the given point and
+  /// update the 'mean' and 'var' values accordingly
+  void getDistribParameters(const Eigen::VectorXd & point,
+                            double & mean,
+                            double & var);
+
   /// Generate the outputs of a random function using the requested inputs
   /// While in the requested Inputs, each column is a different input,
   /// In the result, each row is a different output

@@ -3,6 +3,18 @@
 namespace rosban_gp
 {
 
+CovarianceFunction buildSE(double l, double s)
+{
+  return [l,s](const Eigen::VectorXd & x1,
+               const Eigen::VectorXd & x2)
+  {
+    double s2 = s * s;
+    double l2 = l * l;
+    double d2 = std::pow(x2(0) - x1(0), 2);
+    return s2 * std::exp(-1 / l2 *d2);
+  };
+}
+
 Eigen::MatrixXd buildCovarianceMatrix(const Eigen::MatrixXd & inputs,
                                       CovarianceFunction covar_func)
 {

@@ -34,6 +34,11 @@ public:
                             double & mean,
                             double & var);
 
+  /// Compute the parameters of the multivariate distribution for the given points
+  void getDistribParameters(const Eigen::MatrixXd & points,
+                            Eigen::VectorXd & mu,
+                            Eigen::MatrixXd & sigma);
+
   /// Generate the outputs of a random function using the requested inputs
   /// While in the requested Inputs, each column is a different input,
   /// In the result, each row is a different output

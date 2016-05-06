@@ -87,25 +87,42 @@ void GaussianProcess::getDistribParameters(const Eigen::VectorXd & point,
   var = tmp_var(0,0);
 }
 
+// TODO: check if it is possible to use Cholesky instead
+//       (problems to use the 'solve' since k_star is not a vector)
+void GaussianProcess::getDistribParameters(const Eigen::MatrixXd & points,
+                                           Eigen::VectorXd & mu,
+                                           Eigen::MatrixXd & sigma)
+{
+  // Precomputations
+  Eigen::MatrixXd k_star = buildCovarianceMatrix(inputs, points, *covar_func);
+  Eigen::MatrixXd k_star_t = k_star.transpose();
+  Eigen::MatrixXd points_cov = buildCovarianceMatrix(points, points, *covar_func);
+
+  // Temporary matrix
+  Eigen::MatrixXd tmp, alpha, v, tmp_mu, tmp_var;
+
+  updateInverse();
+
+  tmp_mu = k_star_t * inv_cov * observations;
+
+  if (tmp_mu.cols() != 1)
+  {
+    throw std::logic_error("Unexpected dimension for mu");
+  }
+
+  mu = tmp_mu. col(0);
+  sigma = points_cov - k_star_t * inv_cov * k_star;
+}
+
+
 Eigen::VectorXd
 GaussianProcess::generateValues(const Eigen::MatrixXd & requested_inputs,
                                 std::default_random_engine & engine)
 {
-  updateInverse();
+  Eigen::VectorXd mu;
+  Eigen::MatrixXd sigma;
 
-  Eigen::MatrixXd cov_x_xstar = buildCovarianceMatrix(inputs, requested_inputs, *covar_func);
-  Eigen::MatrixXd cov_xstar_x = buildCovarianceMatrix(requested_inputs, inputs, *covar_func);
-  Eigen::MatrixXd cov_xstar_xstar = buildCovarianceMatrix(requested_inputs, *covar_func);
-
-  Eigen::MatrixXd tmp_mu = cov_xstar_x * inv_cov * observations;
-
-  if (tmp_mu.cols() != 1)
-  {
-    throw std::runtime_error("Unexpected dimension for mu");
-  }
-
-  Eigen::VectorXd mu = tmp_mu.col(0);
-  Eigen::MatrixXd sigma = cov_xstar_xstar - cov_xstar_x * inv_cov * cov_x_xstar;
+  getDistribParameters(requested_inputs, mu, sigma);
 
   MultiVariateGaussian distrib(mu,sigma);
 
@@ -122,6 +139,12 @@ void GaussianProcess::updateCov()
   }
 
   cov = buildCovarianceMatrix(inputs, *covar_func);
+
+  double epsilon = std::pow(measurement_noise,2);
+  // minimal noise is required for numerical stability (cf Rasmussen2006: page 201)
+  epsilon = std::max(epsilon, std::pow(10, -10));
+  Eigen::MatrixXd I = Eigen::MatrixXd::Identity(cov.rows(), cov.rows());
+  cov = cov + epsilon * I;
 }
 
 void GaussianProcess::updateInverse()
@@ -140,12 +163,7 @@ void GaussianProcess::updateCholesky()
 
   updateCov();
 
-  double epsilon = std::pow(measurement_noise,2);
-  // minimal noise is required for numerical stability (cf Rasmussen2006: page 201)
-  epsilon = std::max(epsilon, std::pow(10, -10));
-  Eigen::MatrixXd I;
-  I = Eigen::MatrixXd::Identity(cov.rows(), cov.rows());
-  cholesky = Eigen::LLT<Eigen::MatrixXd>(cov + epsilon * I).matrixL();
+  cholesky = Eigen::LLT<Eigen::MatrixXd>(cov).matrixL();
   dirty_cholesky = false;
 }
 

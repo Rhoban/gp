@@ -29,3 +29,6 @@ add_library(rosban_gp
 
 add_executable(2.9.1 src/exercises/2.9.1.cpp)
 target_link_libraries(2.9.1 rosban_gp)
+
+add_executable(figure2.5 src/exercises/figure2.5.cpp)
+target_link_libraries(figure2.5 rosban_gp)

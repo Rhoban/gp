@@ -21,9 +21,15 @@ GaussianProcess::GaussianProcess(const Eigen::MatrixXd & inputs_,
                                  CovarianceFunction covar_func_)
   : GaussianProcess()
 {
-  covar_func = std::shared_ptr<CovarianceFunction>(new CovarianceFunction(covar_func_));
+  setCovarFunc(covar_func_);
   inputs = inputs_;
   observations = observations_;
+  setDirty();
+}
+
+void GaussianProcess::setCovarFunc(CovarianceFunction f)
+{
+  covar_func = std::shared_ptr<CovarianceFunction>(new CovarianceFunction(f));
   setDirty();
 }
 

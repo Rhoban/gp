@@ -19,9 +19,11 @@ public:
                   const Eigen::VectorXd & observations,
                   CovarianceFunction covar_func);
 
-  /// Update the measurement, covariance matrix will be flagged as 'dirty'
-  void setMeasurementNoise(double noise_stddev);
+  /// Update the covariance function
+  void setCovarFunc(CovarianceFunction f);
 
+  /// Update the measurement noise
+  void setMeasurementNoise(double noise_stddev);
 
   /// Return a prediction of the value at the given point
   double getPrediction(const Eigen::VectorXd & point);
@@ -42,8 +44,6 @@ public:
   /// Generate the outputs of a random function using the requested inputs
   /// While in the requested Inputs, each column is a different input,
   /// In the result, each row is a different output
-  /// WARNING: This method do not handle noise now:
-  /// TODO: see if algorithm 2.1 can be used also with multiple inputs
   Eigen::VectorXd generateValues(const Eigen::MatrixXd & requested_inputs,
                                  std::default_random_engine & engine);
 

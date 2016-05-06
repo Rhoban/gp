@@ -42,9 +42,24 @@ for (i in 1:length(args))
 {
     path <- args[i]
     data <- read.csv(path)
+    plotPoints <- "type" %in% names(data)
     dst <- sprintf("%s%s.png", getBase(path), getFilePrefix(path))
+    observations <- NULL
+    if (plotPoints)
+    {
+        observations <- data[which(data$type == "observation"),]
+        data <- data[which(data$type == "prediction"),]
+#        print(observations)
+    }
     g <- ggplot(data, aes(x= input, y = mean, ymin = min, ymax = max))
     g <- g + geom_line()
+#    g <- g + geom_point()
     g <- g + geom_ribbon(alpha = 0.3)
+    if (plotPoints)
+    {
+        print(observations)
+        g <- g + geom_point(data=observations,mapping=aes(x=input, y=mean),
+                            size=10, color="red", shape = '+')
+    }
     ggsave(dst)
 }

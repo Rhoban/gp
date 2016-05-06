@@ -19,6 +19,10 @@ public:
                   const Eigen::VectorXd & observations,
                   CovarianceFunction covar_func);
 
+  /// Update the measurement, covariance matrix will be flagged as 'dirty'
+  void setMeasurementNoise(double noise_stddev);
+
+
   /// Return a prediction of the value at the given point
   double getPrediction(const Eigen::VectorXd & point);
   /// Return an estimation of the variance at the given point
@@ -33,24 +37,45 @@ public:
   /// Generate the outputs of a random function using the requested inputs
   /// While in the requested Inputs, each column is a different input,
   /// In the result, each row is a different output
+  /// WARNING: This method do not handle noise now:
+  /// TODO: see if algorithm 2.1 can be used also with multiple inputs
   Eigen::VectorXd generateValues(const Eigen::MatrixXd & requested_inputs,
                                  std::default_random_engine & engine);
 
 private:
+  /// Update the covariance matrix if required
+  void updateCov();
+
   /// Update the inverse covariance matrix if required
   void updateInverse();
 
-  ///
+  /// Update the cholesky matrix if required
+  void updateCholesky();
+
+  /// Signal that internal data have changed and that it is required to update internal data
+  void setDirty();
+
+  /// The covariance function used
   std::shared_ptr<CovarianceFunction> covar_func;
+  /// The standard deviation of the measurements
+  double measurement_noise;
 
   /// Known inputs of the gaussian process (row is dimension, col is sample no)
   Eigen::MatrixXd inputs;
   /// Measured outputs (row is sample no)
   Eigen::VectorXd observations;
+  /// Covariance matrix of the inputs
+  Eigen::MatrixXd cov;
   /// Inverse covariance matrix of the inputs
   Eigen::MatrixXd inv_cov;
+  /// The L matrix of the cholesky decomposition of the covariance Matrix (LLT)
+  Eigen::MatrixXd cholesky;
+  /// Is it necessary to update inverse of the covariance matrix
+  bool dirty_cov;
   /// Is it necessary to update inverse of the covariance matrix
   bool dirty_inv;
+  /// Is it necessary to update the cholesky matrix
+  bool dirty_cholesky;
 };
 
 }

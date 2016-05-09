@@ -49,7 +49,6 @@ for (i in 1:length(args))
     {
         observations <- data[which(data$type == "observation"),]
         data <- data[which(data$type == "prediction"),]
-#        print(observations)
     }
     g <- ggplot(data, aes(x= input, y = mean, ymin = min, ymax = max))
     g <- g + geom_line()
@@ -57,7 +56,6 @@ for (i in 1:length(args))
     g <- g + geom_ribbon(alpha = 0.3)
     if (plotPoints)
     {
-        print(observations)
         g <- g + geom_point(data=observations,mapping=aes(x=input, y=mean),
                             size=10, color="red", shape = '+')
     }

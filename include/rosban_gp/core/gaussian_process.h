@@ -47,6 +47,9 @@ public:
   Eigen::VectorXd generateValues(const Eigen::MatrixXd & requested_inputs,
                                  std::default_random_engine & engine);
 
+  /// Compute the log likelihood of the current distribution
+  double getLogMarginalLikelihood();
+
 private:
   /// Update the covariance matrix if required
   void updateCov();
@@ -56,6 +59,9 @@ private:
 
   /// Update the cholesky matrix if required
   void updateCholesky();
+
+  /// Update the alpha matrix if required
+  void updateAlpha();
 
   /// Signal that internal data have changed and that it is required to update internal data
   void setDirty();
@@ -75,12 +81,16 @@ private:
   Eigen::MatrixXd inv_cov;
   /// The L matrix of the cholesky decomposition of the covariance Matrix (LLT)
   Eigen::MatrixXd cholesky;
+  /// The alpha matrix: alpha = L^T \ (L \ y)
+  Eigen::VectorXd alpha;
   /// Is it necessary to update inverse of the covariance matrix
   bool dirty_cov;
   /// Is it necessary to update inverse of the covariance matrix
   bool dirty_inv;
   /// Is it necessary to update the cholesky matrix
   bool dirty_cholesky;
+  /// Is it necessary to update the alpha matrix
+  bool dirty_alpha;
 };
 
 }

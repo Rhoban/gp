@@ -12,7 +12,8 @@ namespace rosban_gp
 GaussianProcess::GaussianProcess()
   : dirty_inv(false),
     dirty_cholesky(false),
-    dirty_cov(false)
+    dirty_cov(false),
+    dirty_alpha(false)
 {
 }
 
@@ -60,37 +61,23 @@ void GaussianProcess::getDistribParameters(const Eigen::VectorXd & point,
                                            double & var)
 {
   // Precomputations
-  Eigen::MatrixXd k_star = buildCovarianceMatrix(inputs, point, *covar_func);
+  Eigen::VectorXd k_star = buildCovarianceMatrix(inputs, point, *covar_func);
   Eigen::MatrixXd k_star_t = k_star.transpose();
-  Eigen::MatrixXd point_cov = buildCovarianceMatrix(point, point, *covar_func);// 1x1 Matrix
+  double point_cov = (*covar_func)(point, point);
 
   // Temporary matrix
-  Eigen::MatrixXd tmp, alpha, v, tmp_mu, tmp_var;
+  Eigen::VectorXd v;
 
   // Line 2
   updateCholesky();
-
   // Line 3
-  tmp = cholesky.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(observations);
-  alpha = cholesky.transpose().jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(tmp);
+  updateAlpha();
   // Line 4
-  tmp_mu = k_star_t * alpha;
+  mean = k_star.dot(alpha);
   // Line 5
   v = cholesky.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(k_star);
   // Line 6
-  tmp_var = point_cov - (v.transpose() * v);
-
-  if (tmp_mu.cols() != 1 || tmp_mu.rows() != 1)
-  {
-    throw std::logic_error("Unexpected dimension for mu");
-  }
-  if (tmp_var.cols() != 1 || tmp_var.rows() != 1)
-  {
-    throw std::logic_error("Unexpected dimension for var");
-  }
-
-  mean = tmp_mu(0,0);
-  var = tmp_var(0,0);
+  var = point_cov - v.dot(v);
 }
 
 // TODO: check if it is possible to use Cholesky instead
@@ -135,6 +122,13 @@ GaussianProcess::generateValues(const Eigen::MatrixXd & requested_inputs,
   return distrib.getSample(engine);
 }
 
+double GaussianProcess::getLogMarginalLikelihood()
+{
+  updateAlpha();
+
+  //double det = 
+}
+
 void GaussianProcess::updateCov()
 {
   if (!dirty_cov) return;
@@ -173,11 +167,26 @@ void GaussianProcess::updateCholesky()
   dirty_cholesky = false;
 }
 
+void GaussianProcess::updateAlpha()
+{
+  if (!dirty_alpha) return;
+
+  updateCholesky();
+
+  Eigen::MatrixXd tmp;
+  // tmp = L \ y
+  tmp = cholesky.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(observations);
+  // alpha = L^T \ tmp = L^T \ (L \ y)
+  alpha = cholesky.transpose().jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(tmp);
+  dirty_alpha = false;
+}
+
 void GaussianProcess::setDirty()
 {
   dirty_cov = true;
   dirty_inv = true;
   dirty_cholesky = true;
+  dirty_alpha = true;
 }
 
 }

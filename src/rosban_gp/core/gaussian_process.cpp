@@ -62,11 +62,7 @@ void GaussianProcess::getDistribParameters(const Eigen::VectorXd & point,
 {
   // Precomputations
   Eigen::VectorXd k_star = buildCovarianceMatrix(inputs, point, *covar_func);
-  Eigen::MatrixXd k_star_t = k_star.transpose();
   double point_cov = (*covar_func)(point, point);
-
-  // Temporary matrix
-  Eigen::VectorXd v;
 
   // Line 2
   updateCholesky();
@@ -75,7 +71,7 @@ void GaussianProcess::getDistribParameters(const Eigen::VectorXd & point,
   // Line 4
   mean = k_star.dot(alpha);
   // Line 5
-  v = cholesky.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(k_star);
+  Eigen::VectorXd v = cholesky.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(k_star);
   // Line 6
   var = point_cov - v.dot(v);
 }

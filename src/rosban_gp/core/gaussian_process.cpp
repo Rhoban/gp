@@ -121,8 +121,36 @@ GaussianProcess::generateValues(const Eigen::MatrixXd & requested_inputs,
 double GaussianProcess::getLogMarginalLikelihood()
 {
   updateAlpha();
+  
+  // compute second term
+  double det = cholesky.diagonal().array().log().sum();
 
-  //double det = 
+  return -0.5 * observations.dot(alpha) - 0.5 * det - 0.5 * log(2 * M_PI);
+}
+
+Eigen::VectorXd GaussianProcess::getLogMarginalLikelihoodGradient()
+{
+  updateInverse();
+  updateAlpha();
+
+  int gradient_dim = 0;//TODO
+  Eigen::VectorXd gradient = Eigen::VectorXd::Zero(gradient_dim);
+
+  Eigen::MatrixXd weights = alpha * alpha.transpose() - inv_cov;
+
+  // Since we compute the trace: Each element i, j of the matrix is counted
+  // only once, and is multiplied by itself.
+  // NOTE: Due to symetry, it would be possible to compute only half of those
+  // factors, however it is pointless to do that without proper benchmark
+  int size = weights.cols();
+  for(int row = 0; row < size; row++) {
+    for (int col = 0; col < size; col++) {
+      Eigen::VectorXd tmp_grad;// TODO = ...
+      gradient += 0.5 * tmp_grad * weights(row, col);
+    }
+  }
+
+  return gradient;
 }
 
 void GaussianProcess::updateCov()

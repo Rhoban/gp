@@ -48,7 +48,12 @@ public:
                                  std::default_random_engine & engine);
 
   /// Compute the log likelihood of the current distribution
+  /// i.e. p(observations|inputs,theta) with theta the parameters of the covariance function
   double getLogMarginalLikelihood();
+
+  /// Return the partial derivatives of the log likelihood with respect to the
+  /// parameters of the covariance function
+  Eigen::VectorXd getLogMarginalLikelihoodGradient();
 
 private:
   /// Update the covariance matrix if required

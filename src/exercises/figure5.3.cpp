@@ -21,48 +21,52 @@ int main(int argc, char ** argv)
   double x_min = -8;
   double x_max = 8;
   // Parameters
-  int nb_points = 21;
+  std::vector<int> nb_points_vec = {8,21,55};
   double length_scale = 1;
   double sn = 0.1;
   double sf = 1;
 
   auto engine = get_random_engine();
 
-  // Generating inputs
-  std::uniform_real_distribution<double> input_distrib(x_min, x_max);
-  Eigen::MatrixXd inputs(1,nb_points);
-  for (int p = 0; p < nb_points; p++)
-  {
-    inputs(0,p) = input_distrib(engine);
-  }
-
-  // Generating observations
-  std::unique_ptr<CovarianceFunction> generative_func(new SquaredExponential(length_scale, sf));
-  GaussianProcess generative_gp;
-  generative_gp.setCovarFunc(std::move(generative_func));
-  generative_gp.setMeasurementNoise(sn);
-  Eigen::VectorXd observations = generative_gp.generateValues(inputs, engine);
-
   std::ofstream out;
   out.open("fig_5_3_b.csv");
 
-  out << "lengthScale,logMarginalLikelihood" << std::endl;
+  out << "nbPoints,lengthScale,logMarginalLikelihood" << std::endl;
 
-  // Generating data
-  int nb_plot_points = 1000;
-  double min_l_exp = -5;
-  double max_l_exp =  1;
-  for (int point = 0; point < nb_plot_points; point++)
+  for (int nb_points : nb_points_vec)
   {
-    double delta = max_l_exp - min_l_exp;
-    double exp = min_l_exp + delta *  point / nb_plot_points;
-    double l = std::pow(10, exp);
-    // Create GP with the given parameter
-    std::unique_ptr<CovarianceFunction> f(new SquaredExponential(l, sf));
-    GaussianProcess gp(inputs, observations, std::move(f));
-    gp.setMeasurementNoise(sn);
 
-    out << l << "," << gp.getLogMarginalLikelihood() << std::endl;
+    // Generating inputs
+    std::uniform_real_distribution<double> input_distrib(x_min, x_max);
+    Eigen::MatrixXd inputs(1,nb_points);
+    for (int p = 0; p < nb_points; p++)
+    {
+      inputs(0,p) = input_distrib(engine);
+    }
+
+    // Generating observations
+    std::unique_ptr<CovarianceFunction> generative_func(new SquaredExponential(length_scale, sf));
+    GaussianProcess generative_gp;
+    generative_gp.setCovarFunc(std::move(generative_func));
+    generative_gp.setMeasurementNoise(sn);
+    Eigen::VectorXd observations = generative_gp.generateValues(inputs, engine);
+
+    // Generating data
+    int nb_plot_points = 1000;
+    double min_l_exp = -5;
+    double max_l_exp =  1;
+    for (int point = 0; point < nb_plot_points; point++)
+    {
+      double delta = max_l_exp - min_l_exp;
+      double exp = min_l_exp + delta *  point / nb_plot_points;
+      double l = std::pow(10, exp);
+      // Create GP with the given parameter
+      std::unique_ptr<CovarianceFunction> f(new SquaredExponential(l, sf));
+      GaussianProcess gp(inputs, observations, std::move(f));
+      gp.setMeasurementNoise(sn);
+
+      out << nb_points << "," << l << "," << gp.getLogMarginalLikelihood() << std::endl;
+    }
   }
 
   out.close();

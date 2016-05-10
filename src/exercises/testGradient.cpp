@@ -22,7 +22,8 @@ int main(int argc, char ** argv)
   double x_min = -8;
   double x_max = 8;
   // Parameters
-  int nb_points = 50;
+  int nb_points = 50;// Points used to sample function
+  int nb_prediction_points = 1000;
   double length_scale = 1;
   double sn = 0.1;
   double sf = 1;
@@ -50,7 +51,6 @@ int main(int argc, char ** argv)
   last_guess = Eigen::VectorXd::Constant(3,0);
   double epsilon = std::pow(10, -6);
   double gamma = 0.0001;
-  double max_step = 0.05;
 
   GaussianProcess gp(inputs, observations,
                      std::unique_ptr<CovarianceFunction>(new SquaredExponential()));
@@ -70,13 +70,44 @@ int main(int argc, char ** argv)
         gain = - last_guess(i) / gradient(i);
       }
     }
-    // Hack: avoid huge steps
-    Eigen::VectorXd step = gain * gradient;
-    //double step_size = step.lpNorm<Eigen::Infinity>();
-    //if (step_size > max_step)
-    //{
-    //  step *= max_step / step_size;
-    //}
-    guess = last_guess + step;
+    guess = last_guess + gain * gradient;
   }
+
+  // Use final guess
+  gp.setParameters(guess);
+
+  // Writing predictions + points
+  std::ofstream out;
+  out.open("gradient_predictions.csv");
+  out << "type,input,mean,min,max" << std::endl;
+
+  // Writing Ref points
+  for (int i = 0; i < inputs.cols(); i++)
+  {
+    // write with the same format but min and max carry no meaning
+    out << "observation," << inputs(0,i) << "," << observations(i) << ",0,0" << std::endl;
+  }
+  
+  // Writing predictions
+  for (int point = 0; point < nb_prediction_points; point++)
+  {
+    // Computing input
+    double delta = x_max - x_min;
+    double x = x_min + delta * point / nb_prediction_points;
+    Eigen::VectorXd prediction_input(1);
+    prediction_input(0) = x; 
+    // Retrieving distrib parameters
+    double mean, var;
+    gp.getDistribParameters(prediction_input, mean, var);
+    // Getting +- 2 stddev
+    double interval = 2 * std::sqrt(var);
+    double min = mean - interval;
+    double max = mean + interval;
+    // Writing line
+    out << "prediction," << x << ","
+        << mean << "," << min << "," << max << std::endl;
+  }
+
+  out.close();
+
 }

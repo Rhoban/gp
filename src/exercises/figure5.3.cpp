@@ -31,7 +31,7 @@ int main(int argc, char ** argv)
   std::ofstream out;
   out.open("fig_5_3_b.csv");
 
-  out << "nbPoints,lengthScale,logMarginalLikelihood" << std::endl;
+  out << "nbPoints,lengthScale,logMarginalLikelihood,derivateSN,derivateSF,derivateL" << std::endl;
 
   for (int nb_points : nb_points_vec)
   {
@@ -44,12 +44,12 @@ int main(int argc, char ** argv)
       inputs(0,p) = input_distrib(engine);
     }
 
-    // Generating observations
+    // Generating noisy observations
     std::unique_ptr<CovarianceFunction> generative_func(new SquaredExponential(length_scale, sf));
     GaussianProcess generative_gp;
     generative_gp.setCovarFunc(std::move(generative_func));
     generative_gp.setMeasurementNoise(sn);
-    Eigen::VectorXd observations = generative_gp.generateValues(inputs, engine);
+    Eigen::VectorXd observations = generative_gp.generateValues(inputs, engine, true);
 
     // Generating data
     int nb_plot_points = 1000;
@@ -65,7 +65,11 @@ int main(int argc, char ** argv)
       GaussianProcess gp(inputs, observations, std::move(f));
       gp.setMeasurementNoise(sn);
 
-      out << nb_points << "," << l << "," << gp.getLogMarginalLikelihood() << std::endl;
+      double log_marginal_likelihood = gp.getLogMarginalLikelihood();
+      Eigen::VectorXd gradient = gp.getMarginalLikelihoodGradient();
+
+      out << nb_points << "," << l << "," << log_marginal_likelihood << ","
+          << gradient(0) << "," << gradient(1) << "," << gradient(2) << std::endl;
     }
   }
 

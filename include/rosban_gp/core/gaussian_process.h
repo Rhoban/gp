@@ -52,8 +52,11 @@ public:
   /// Generate the outputs of a random function using the requested inputs
   /// While in the requested Inputs, each column is a different input,
   /// In the result, each row is a different output
+  /// If add measurement noise is chosen, then an independent measurement noise
+  /// with the provided standard deviation is applied on each measurement
   Eigen::VectorXd generateValues(const Eigen::MatrixXd & requested_inputs,
-                                 std::default_random_engine & engine);
+                                 std::default_random_engine & engine,
+                                 bool add_measurement_noise = false);
 
   /// Compute the log likelihood of the current distribution
   /// i.e. p(observations|inputs,theta) with theta the parameters of the covariance function

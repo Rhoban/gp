@@ -37,19 +37,20 @@ int main(int argc, char ** argv)
     inputs(0,p) = input_distrib(engine);
   }
 
-  // Generating observations
+  // Generating noisy observations
   std::unique_ptr<CovarianceFunction> generative_func(new SquaredExponential(length_scale, sf));
   GaussianProcess generative_gp;
   generative_gp.setCovarFunc(std::move(generative_func));
   generative_gp.setMeasurementNoise(sn);
-  Eigen::VectorXd observations = generative_gp.generateValues(inputs, engine);
+  Eigen::VectorXd observations = generative_gp.generateValues(inputs, engine, true);
 
   // Optimizing using gradient ascent
   Eigen::VectorXd guess, last_guess;
   guess      = Eigen::VectorXd::Constant(3,1);
   last_guess = Eigen::VectorXd::Constant(3,0);
-  double epsilon = std::pow(10, -4);
-  double gamma = 0.01;
+  double epsilon = std::pow(10, -6);
+  double gamma = 0.0001;
+  double max_step = 0.05;
 
   GaussianProcess gp(inputs, observations,
                      std::unique_ptr<CovarianceFunction>(new SquaredExponential()));
@@ -69,6 +70,13 @@ int main(int argc, char ** argv)
         gain = - last_guess(i) / gradient(i);
       }
     }
-    guess = last_guess + gain * gradient;
+    // Hack: avoid huge steps
+    Eigen::VectorXd step = gain * gradient;
+    //double step_size = step.lpNorm<Eigen::Infinity>();
+    //if (step_size > max_step)
+    //{
+    //  step *= max_step / step_size;
+    //}
+    guess = last_guess + step;
   }
 }

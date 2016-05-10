@@ -130,7 +130,8 @@ void GaussianProcess::getDistribParameters(const Eigen::MatrixXd & points,
 
 Eigen::VectorXd
 GaussianProcess::generateValues(const Eigen::MatrixXd & requested_inputs,
-                                std::default_random_engine & engine)
+                                std::default_random_engine & engine,
+                                bool add_measurement_noise)
 {
   Eigen::VectorXd mu;
   Eigen::MatrixXd sigma;
@@ -139,7 +140,19 @@ GaussianProcess::generateValues(const Eigen::MatrixXd & requested_inputs,
 
   MultiVariateGaussian distrib(mu,sigma);
 
-  return distrib.getSample(engine);
+  Eigen::VectorXd values = distrib.getSample(engine);
+
+  // Adding measurement noise
+  if (add_measurement_noise)
+  {
+    std::normal_distribution<double> measurement_distrib(0, measurement_noise);
+    for (int i = 0; i < values.rows(); i++)
+    {
+      values(i) += measurement_distrib(engine);
+    }
+  }
+
+  return values;
 }
 
 double GaussianProcess::getLogMarginalLikelihood()
@@ -175,7 +188,8 @@ Eigen::VectorXd GaussianProcess::getMarginalLikelihoodGradient()
   // Since we compute the trace: Each couple i, j of the matrix with i == j  is counted once
   for(int i = 0; i < size; i++) {
     Eigen::VectorXd tmp_grad = getCovarFunc().computeGradient(inputs.col(i), inputs.col(i));
-    gradient(0) += 0.5 * weights(i, i);// measurement_noise has always a derivative of 1
+    // measurement_noise is squared, therefore, dev is 2x
+    gradient(0) += measurement_noise * weights(i, i);
     gradient.segment(1, gradient_dim - 1) += 0.5 * tmp_grad * weights(i, i);
   }
   return gradient;

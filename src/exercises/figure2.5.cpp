@@ -35,11 +35,11 @@ int main(int argc, char ** argv)
     inputs(0,p) = input_distrib(engine);
   }
 
-  // Generating observations
+  // Generating noisy observations
   std::unique_ptr<CovarianceFunction> generative_func(new SquaredExponential());
   GaussianProcess generative_gp;
   generative_gp.setCovarFunc(std::move(generative_func));
-  Eigen::VectorXd observations = generative_gp.generateValues(inputs, engine);
+  Eigen::VectorXd observations = generative_gp.generateValues(inputs, engine, true);
 
   // Evaluation parameters
   std::vector<double> l_values  = {1  , 0.3    , 3   }; // Length-scale

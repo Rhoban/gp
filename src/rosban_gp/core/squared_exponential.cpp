@@ -56,8 +56,8 @@ Eigen::VectorXd SquaredExponential::computeGradient(const Eigen::VectorXd & x1,
   Eigen::VectorXd z = (x1-x2).cwiseQuotient(length_scales).array().square();  
   double s2 = std::pow(process_noise, 2);
   double k = s2*exp(-0.5*z.sum());
-  gradient.head(input_dim) = z * k;
-  gradient(input_dim) = 2.0 * k;
+  gradient.segment(1,input_dim) = z * k;
+  gradient(0) = 2.0 * k;
   return gradient;
 }
 

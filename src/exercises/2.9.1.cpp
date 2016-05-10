@@ -70,6 +70,7 @@ int main(int argc, char ** argv)
   posterior_out << "func,input,output" << std::endl;
   for (int func_id = 1; func_id <= nb_func; func_id++)
   {
+    // Not adding noise for estimating the posterior
     Eigen::VectorXd func_values = gp.generateValues(input, engine);
     for (int i = 0; i < nb_points; i++)
     {

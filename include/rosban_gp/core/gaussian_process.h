@@ -1,6 +1,6 @@
 #pragma once
 
-#include "rosban_gp/tools.h"
+#include "rosban_gp/core/covariance_function.h"
 
 #include <Eigen/Core>
 
@@ -17,10 +17,14 @@ public:
 
   GaussianProcess(const Eigen::MatrixXd & inputs,
                   const Eigen::VectorXd & observations,
-                  CovarianceFunction covar_func);
+                  std::unique_ptr<CovarianceFunction> covar_func);
+
+  /// Since modifying the CovarianceFunction requires to set the flags to dirty,
+  /// access is const only.
+  const CovarianceFunction & getCovarFunc() const;
 
   /// Update the covariance function
-  void setCovarFunc(CovarianceFunction f);
+  void setCovarFunc(std::unique_ptr<CovarianceFunction> f);
 
   /// Update the measurement noise
   void setMeasurementNoise(double noise_stddev);
@@ -71,8 +75,9 @@ private:
   /// Signal that internal data have changed and that it is required to update internal data
   void setDirty();
 
-  /// The covariance function used
-  std::shared_ptr<CovarianceFunction> covar_func;
+  /// The covariance function used. By using unique_ptr, we make 'sure' that the function
+  /// cannot be modified from outside
+  std::unique_ptr<CovarianceFunction> covar_func;
   /// The standard deviation of the measurements
   double measurement_noise;
 

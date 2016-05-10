@@ -19,18 +19,25 @@ GaussianProcess::GaussianProcess()
 
 GaussianProcess::GaussianProcess(const Eigen::MatrixXd & inputs_,
                                  const Eigen::VectorXd & observations_,
-                                 CovarianceFunction covar_func_)
+                                 std::unique_ptr<CovarianceFunction> covar_func_)
   : GaussianProcess()
 {
-  setCovarFunc(covar_func_);
   inputs = inputs_;
   observations = observations_;
+  setCovarFunc(std::move(covar_func_));
   setDirty();
 }
 
-void GaussianProcess::setCovarFunc(CovarianceFunction f)
+const CovarianceFunction & GaussianProcess::getCovarFunc() const
 {
-  covar_func = std::shared_ptr<CovarianceFunction>(new CovarianceFunction(f));
+  if (!covar_func)
+    throw std::runtime_error("GaussianProcess::getCovarFunc(): covar_func is not defined");
+  return *covar_func;
+}
+
+void GaussianProcess::setCovarFunc(std::unique_ptr<CovarianceFunction> covar_func_)
+{
+  covar_func = std::move(covar_func_);
   setDirty();
 }
 
@@ -39,7 +46,6 @@ void GaussianProcess::setMeasurementNoise(double noise_stddev)
   measurement_noise = noise_stddev;
   setDirty();
 }
-
 
 double GaussianProcess::getPrediction(const Eigen::VectorXd & point)
 {
@@ -61,8 +67,8 @@ void GaussianProcess::getDistribParameters(const Eigen::VectorXd & point,
                                            double & var)
 {
   // Precomputations
-  Eigen::VectorXd k_star = buildCovarianceMatrix(inputs, point, *covar_func);
-  double point_cov = (*covar_func)(point, point);
+  Eigen::VectorXd k_star = getCovarFunc().buildMatrix(inputs, point);
+  double point_cov = getCovarFunc().compute(point);
 
   // Line 2
   updateCholesky();
@@ -83,12 +89,12 @@ void GaussianProcess::getDistribParameters(const Eigen::MatrixXd & points,
                                            Eigen::MatrixXd & sigma)
 {
   // Precomputations
-  Eigen::MatrixXd k_star = buildCovarianceMatrix(inputs, points, *covar_func);
+  Eigen::MatrixXd k_star = getCovarFunc().buildMatrix(inputs, points);
   Eigen::MatrixXd k_star_t = k_star.transpose();
-  Eigen::MatrixXd points_cov = buildCovarianceMatrix(points, points, *covar_func);
+  Eigen::MatrixXd points_cov = getCovarFunc().buildMatrix(points);
 
   // Temporary matrix
-  Eigen::MatrixXd tmp, alpha, v, tmp_mu, tmp_var;
+  Eigen::MatrixXd tmp_mu;
 
   updateInverse();
 
@@ -157,12 +163,7 @@ void GaussianProcess::updateCov()
 {
   if (!dirty_cov) return;
 
-  if (!covar_func)
-  {
-    throw std::runtime_error("GaussianProcess::updateCov: covar_func is not defined yet");
-  }
-
-  cov = buildCovarianceMatrix(inputs, *covar_func);
+  cov = getCovarFunc().buildMatrix(inputs);
 
   double epsilon = std::pow(measurement_noise,2);
   // minimal noise is required for numerical stability (cf Rasmussen2006: page 201)

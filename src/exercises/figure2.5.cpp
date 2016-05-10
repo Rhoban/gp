@@ -1,8 +1,8 @@
 /// This file implement the production of the data presented at Figure 2.5 in Rasmussen 2006
 
 #include "rosban_gp/multivariate_gaussian.h"
-#include "rosban_gp/tools.h"
 #include "rosban_gp/core/gaussian_process.h"
+#include "rosban_gp/core/squared_exponential.h"
 
 #include <functional>
 #include <fstream>
@@ -36,9 +36,9 @@ int main(int argc, char ** argv)
   }
 
   // Generating observations
-  CovarianceFunction generative_func = buildSE(1,1);
+  std::unique_ptr<CovarianceFunction> generative_func(new SquaredExponential());
   GaussianProcess generative_gp;
-  generative_gp.setCovarFunc(generative_func);
+  generative_gp.setCovarFunc(std::move(generative_func));
   Eigen::VectorXd observations = generative_gp.generateValues(inputs, engine);
 
   // Evaluation parameters
@@ -62,7 +62,8 @@ int main(int argc, char ** argv)
     double sf = sf_values[i];
     double sn = sn_values[i];
     // Creating GP with appropriate parameters
-    GaussianProcess gp(inputs, observations, buildSE(l, sf));
+    std::unique_ptr<CovarianceFunction> covar_func(new SquaredExponential(l,sf));
+    GaussianProcess gp(inputs, observations, std::move(covar_func));
     gp.setMeasurementNoise(sn);
     // Computing file path
     std::ostringstream path;

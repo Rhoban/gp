@@ -1,12 +1,12 @@
 #include "rosban_gp/multivariate_gaussian.h"
-#include "rosban_gp/tools.h"
 #include "rosban_gp/core/gaussian_process.h"
+#include "rosban_gp/core/squared_exponential.h"
 
 #include <functional>
 #include <fstream>
 #include <chrono>
 
-using rosban_gp::MultiVariateGaussian;
+using namespace rosban_gp;
 
 std::default_random_engine get_random_engine()
 {
@@ -34,15 +34,10 @@ int main(int argc, char ** argv)
     x += x_step;
   }
 
-  rosban_gp::CovarianceFunction covar_func = [](const Eigen::VectorXd & p1,
-                                                const Eigen::VectorXd & p2)
-    {
-      double norm2 = (p1 - p2).squaredNorm();
-      return std::exp(-0.5 * norm2);
-    };
+  std::unique_ptr<CovarianceFunction> covar_func(new SquaredExponential());
 
   Eigen::VectorXd mu = Eigen::VectorXd::Zero(nb_points);
-  Eigen::MatrixXd sigma = rosban_gp::buildCovarianceMatrix(input, covar_func);
+  Eigen::MatrixXd sigma = covar_func->buildMatrix(input);
 
   std::default_random_engine engine = get_random_engine();
   MultiVariateGaussian distrib(mu, sigma);
@@ -53,7 +48,7 @@ int main(int argc, char ** argv)
   samples << -4, -3, 0, 2, 3;
   observations << -1.5, -1, 1, 0.5, 0;
 
-  rosban_gp::GaussianProcess gp(samples, observations, covar_func);
+  GaussianProcess gp(samples, observations, std::move(covar_func));
 
   std::ofstream prior_out, posterior_out, prediction_out;
 

@@ -8,6 +8,15 @@ namespace rosban_gp
 class CovarianceFunction
 {
 public:
+  /// Return the number of parameters
+  virtual int getNbParameters() const = 0;
+
+  /// Get the function parameters (order matters)
+  virtual Eigen::VectorXd getParameters() const = 0;
+
+  /// Set the function parameters (order matters)
+  virtual void setParameters(const Eigen::VectorXd & parameters) = 0;
+
   /// Compute covar(x,x)
   double compute(const Eigen::VectorXd & x) const;
 
@@ -17,8 +26,6 @@ public:
   /// Compute the gradient of covar(x1,x2) with respect to the function parameters
   virtual Eigen::VectorXd computeGradient(const Eigen::VectorXd & x1,
                                           const Eigen::VectorXd & x2) const = 0;
-
-
 
   /// Build a covariance Matrix K such as:
   /// K_{i,j} = covar_func(inputs.col(i), inputs.col(j))

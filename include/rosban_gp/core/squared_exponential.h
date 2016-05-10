@@ -17,6 +17,14 @@ public:
   /// Multi-dimensional input
   SquaredExponential(const Eigen::VectorXd & length_scales, double process_noise);
 
+  int getNbParameters() const override;
+
+  /// Get the parameters: [sf, l_1, l_2, ..., l_n]
+  Eigen::VectorXd getParameters() const override;
+
+  /// Set the parameters: [sf, l_1, l_2, ..., l_n]
+  void setParameters(const Eigen::VectorXd & parameters) override;
+
   double compute(const Eigen::VectorXd & x1, const Eigen::VectorXd & x2) const override;
 
   Eigen::VectorXd computeGradient(const Eigen::VectorXd & x1,

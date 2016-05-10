@@ -19,6 +19,10 @@ public:
                   const Eigen::VectorXd & observations,
                   std::unique_ptr<CovarianceFunction> covar_func);
 
+  /// Set the parameters for measurement noise and covariance function
+  /// Order is as follows: [measurement_noise, covar_parameters]
+  void setParameters(const Eigen::VectorXd & parameters);
+
   /// Since modifying the CovarianceFunction requires to set the flags to dirty,
   /// access is const only.
   const CovarianceFunction & getCovarFunc() const;
@@ -55,9 +59,9 @@ public:
   /// i.e. p(observations|inputs,theta) with theta the parameters of the covariance function
   double getLogMarginalLikelihood();
 
-  /// Return the partial derivatives of the log likelihood with respect to the
+  /// Return the partial derivatives of the marginal likelihood with respect to the
   /// parameters of the covariance function
-  Eigen::VectorXd getLogMarginalLikelihoodGradient();
+  Eigen::VectorXd getMarginalLikelihoodGradient();
 
 private:
   /// Update the covariance matrix if required

@@ -20,6 +20,24 @@ SquaredExponential::SquaredExponential(const Eigen::VectorXd & l, double sf)
 {
 }
 
+int SquaredExponential::getNbParameters() const
+{
+  return length_scales.rows() + 1;
+}
+
+Eigen::VectorXd SquaredExponential::getParameters() const
+{
+  Eigen::VectorXd params(getNbParameters());
+  params(0) = process_noise;
+  params.segment(1, length_scales.rows()) = length_scales;
+  return params;
+}
+
+void SquaredExponential::setParameters(const Eigen::VectorXd & parameters)
+{
+  process_noise = parameters(0);
+  length_scales = parameters.segment(1, parameters.rows() - 1);
+}
 
 double SquaredExponential::compute(const Eigen::VectorXd & x1,
                                    const Eigen::VectorXd & x2) const

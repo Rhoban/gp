@@ -6,6 +6,9 @@
 #include <Eigen/LU>       // Required for inverse computation
 #include <Eigen/SVD>      // Required for jacobiSVD
 
+#include <sstream>
+#include <stdexcept>
+
 namespace rosban_gp
 {
 
@@ -25,6 +28,21 @@ GaussianProcess::GaussianProcess(const Eigen::MatrixXd & inputs_,
   inputs = inputs_;
   observations = observations_;
   setCovarFunc(std::move(covar_func_));
+  setDirty();
+}
+
+void GaussianProcess::setParameters(const Eigen::VectorXd & parameters)
+{
+  int nb_parameters = 1 + getCovarFunc().getNbParameters();
+  if (parameters.rows() != nb_parameters)
+  {
+    std::ostringstream oss;
+    oss << "GaussianProcess::setParameters: " << parameters.rows()
+        << " parameters received, while expecting " << nb_parameters << " parameters";
+    throw std::runtime_error(oss.str());
+  }
+  measurement_noise = parameters(0);
+  covar_func->setParameters(parameters.segment(1, nb_parameters -1));
   setDirty();
 }
 
@@ -134,28 +152,32 @@ double GaussianProcess::getLogMarginalLikelihood()
   return -0.5 * observations.dot(alpha) - 0.5 * det - 0.5 * log(2 * M_PI);
 }
 
-Eigen::VectorXd GaussianProcess::getLogMarginalLikelihoodGradient()
+Eigen::VectorXd GaussianProcess::getMarginalLikelihoodGradient()
 {
   updateInverse();
   updateAlpha();
 
-  int gradient_dim = 0;//TODO
+  // Dims: measurement_noise, covar_function_parameters
+  int gradient_dim = getCovarFunc().getNbParameters() + 1;
   Eigen::VectorXd gradient = Eigen::VectorXd::Zero(gradient_dim);
 
   Eigen::MatrixXd weights = alpha * alpha.transpose() - inv_cov;
 
-  // Since we compute the trace: Each element i, j of the matrix is counted
-  // only once, and is multiplied by itself.
-  // NOTE: Due to symetry, it would be possible to compute only half of those
-  // factors, however it is pointless to do that without proper benchmark
+  // Since we compute the trace: Each couple i, j of the matrix with i < j  is counted twice
   int size = weights.cols();
   for(int row = 0; row < size; row++) {
-    for (int col = 0; col < size; col++) {
-      Eigen::VectorXd tmp_grad;// TODO = ...
-      gradient += 0.5 * tmp_grad * weights(row, col);
+    for (int col = 0; col < row; col++) {
+      Eigen::VectorXd tmp_grad = getCovarFunc().computeGradient(inputs.col(row), inputs.col(col));
+      // measurement noise has no effect if row != col
+      gradient.segment(1, gradient_dim - 1) += tmp_grad * weights(row, col);
     }
   }
-
+  // Since we compute the trace: Each couple i, j of the matrix with i == j  is counted once
+  for(int i = 0; i < size; i++) {
+    Eigen::VectorXd tmp_grad = getCovarFunc().computeGradient(inputs.col(i), inputs.col(i));
+    gradient(0) += 0.5 * weights(i, i);// measurement_noise has always a derivative of 1
+    gradient.segment(1, gradient_dim - 1) += 0.5 * tmp_grad * weights(i, i);
+  }
   return gradient;
 }
 

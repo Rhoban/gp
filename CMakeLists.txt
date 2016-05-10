@@ -36,3 +36,6 @@ target_link_libraries(figure2.5 rosban_gp)
 
 add_executable(figure5.3 src/exercises/figure5.3.cpp)
 target_link_libraries(figure5.3 rosban_gp)
+
+add_executable(testGradient src/exercises/testGradient.cpp)
+target_link_libraries(testGradient rosban_gp)

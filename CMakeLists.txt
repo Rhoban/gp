@@ -33,3 +33,6 @@ target_link_libraries(2.9.1 rosban_gp)
 
 add_executable(figure2.5 src/exercises/figure2.5.cpp)
 target_link_libraries(figure2.5 rosban_gp)
+
+add_executable(figure5.3 src/exercises/figure5.3.cpp)
+target_link_libraries(figure5.3 rosban_gp)

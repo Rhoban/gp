@@ -1,6 +1,6 @@
 #include "rosban_gp/core/gaussian_process.h"
 
-#include "rosban_gp/multivariate_gaussian.h"
+#include "rosban_random/multivariate_gaussian.h"
 
 #include <Eigen/Cholesky>
 #include <Eigen/LU>       // Required for inverse computation
@@ -8,6 +8,8 @@
 
 #include <sstream>
 #include <stdexcept>
+
+using rosban_random::MultiVariateGaussian;
 
 namespace rosban_gp
 {

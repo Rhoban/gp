@@ -1,6 +1,6 @@
 /// This file implement the production of the data presented at Figure 2.5 in Rasmussen 2006
 
-#include "rosban_gp/multivariate_gaussian.h"
+#include "rosban_random/multivariate_gaussian.h"
 #include "rosban_gp/core/gaussian_process.h"
 #include "rosban_gp/core/squared_exponential.h"
 
@@ -10,7 +10,7 @@
 
 using namespace rosban_gp;
 
-std::default_random_engine get_random_engine()
+std::default_random_engine getRandomEngine()
 {
   unsigned long seed = std::chrono::system_clock::now().time_since_epoch().count();
   return std::default_random_engine(seed);
@@ -25,7 +25,7 @@ int main(int argc, char ** argv)
   int nb_test_points = 30;
   int nb_prediction_points = 1000;
 
-  auto engine = get_random_engine();
+  auto engine = getRandomEngine();
 
   // Generating inputs
   std::uniform_real_distribution<double> input_distrib(x_min, x_max);

@@ -1,4 +1,4 @@
-#include "rosban_gp/multivariate_gaussian.h"
+#include "rosban_random/multivariate_gaussian.h"
 #include "rosban_gp/core/gaussian_process.h"
 #include "rosban_gp/core/squared_exponential.h"
 
@@ -9,7 +9,7 @@
 
 using namespace rosban_gp;
 
-std::default_random_engine get_random_engine()
+std::default_random_engine getRandomEngine()
 {
   unsigned long seed = std::chrono::system_clock::now().time_since_epoch().count();
   return std::default_random_engine(seed);
@@ -23,7 +23,7 @@ Eigen::VectorXd generateObservations(const Eigen::MatrixXd & inputs,
                                      std::function<double(const Eigen::VectorXd &)> f,
                                      double measurement_noise)
 {
-  auto engine = get_random_engine();
+  auto engine = getRandomEngine();
 
   std::normal_distribution<double> noise_distrib(0, measurement_noise);
 
@@ -69,7 +69,7 @@ int main(int argc, char ** argv)
   double sn = 0.1;
   double sf = 1;
 
-  auto engine = get_random_engine();
+  auto engine = getRandomEngine();
 
   // Generating inputs
   std::uniform_real_distribution<double> input_distrib(x_min, x_max);

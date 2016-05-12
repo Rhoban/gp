@@ -1,18 +1,15 @@
-#include "rosban_gp/multivariate_gaussian.h"
 #include "rosban_gp/core/gaussian_process.h"
 #include "rosban_gp/core/squared_exponential.h"
+
+#include "rosban_random/multivariate_gaussian.h"
+#include "rosban_random/tools.h"
 
 #include <functional>
 #include <fstream>
 #include <chrono>
 
 using namespace rosban_gp;
-
-std::default_random_engine get_random_engine()
-{
-  unsigned long seed = std::chrono::system_clock::now().time_since_epoch().count();
-  return std::default_random_engine(seed);
-}
+using rosban_random::MultiVariateGaussian;
 
 int main(int argc, char ** argv)
 {
@@ -39,7 +36,7 @@ int main(int argc, char ** argv)
   Eigen::VectorXd mu = Eigen::VectorXd::Zero(nb_points);
   Eigen::MatrixXd sigma = covar_func->buildMatrix(input);
 
-  std::default_random_engine engine = get_random_engine();
+  std::default_random_engine engine = rosban_random::getRandomEngine();
   MultiVariateGaussian distrib(mu, sigma);
 
   // Samples used

@@ -3,6 +3,7 @@ project(rosban_gp)
 
 find_package(catkin REQUIRED
   cmake_modules
+  rosban_random
   )
 
 find_package(Eigen REQUIRED)
@@ -22,20 +23,20 @@ include_directories(
 
 # Declare a C++ library
 add_library(rosban_gp
-  src/rosban_gp/multivariate_gaussian.cpp
   src/rosban_gp/core/covariance_function.cpp
   src/rosban_gp/core/gaussian_process.cpp
   src/rosban_gp/core/squared_exponential.cpp
 )
+target_link_libraries(rosban_gp ${catkin_LIBRARIES})
 
 add_executable(2.9.1 src/exercises/2.9.1.cpp)
-target_link_libraries(2.9.1 rosban_gp)
+target_link_libraries(2.9.1 rosban_gp ${catkin_LIBRARIES})
 
 add_executable(figure2.5 src/exercises/figure2.5.cpp)
-target_link_libraries(figure2.5 rosban_gp)
+target_link_libraries(figure2.5 rosban_gp ${catkin_LIBRARIES})
 
 add_executable(figure5.3 src/exercises/figure5.3.cpp)
-target_link_libraries(figure5.3 rosban_gp)
+target_link_libraries(figure5.3 rosban_gp ${catkin_LIBRARIES})
 
 add_executable(testGradient src/exercises/testGradient.cpp)
-target_link_libraries(testGradient rosban_gp)
+target_link_libraries(testGradient rosban_gp ${catkin_LIBRARIES})

@@ -23,6 +23,8 @@ include_directories(
 
 # Declare a C++ library
 add_library(rosban_gp
+  src/rosban_gp/auto_tuning.cpp
+  src/rosban_gp/tools.cpp
   src/rosban_gp/core/covariance_function.cpp
   src/rosban_gp/core/gaussian_process.cpp
   src/rosban_gp/core/squared_exponential.cpp
@@ -40,3 +42,6 @@ target_link_libraries(figure5.3 rosban_gp ${catkin_LIBRARIES})
 
 add_executable(testGradient src/exercises/testGradient.cpp)
 target_link_libraries(testGradient rosban_gp ${catkin_LIBRARIES})
+
+add_executable(test_randomized_gp src/experiments/test_randomized_gp.cpp)
+target_link_libraries(test_randomized_gp rosban_gp ${catkin_LIBRARIES})

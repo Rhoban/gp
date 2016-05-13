@@ -59,11 +59,17 @@ int main(int argc, char ** argv)
   Eigen::VectorXd gamma(3);
   gamma << std::pow(10, -5), std::pow(10,-2), std::pow(10,-2);
   double epsilon = std::pow(10, -6);
+  Eigen::MatrixXd param_limits(3,2);
+  param_limits <<
+    std::pow(10,-10), std::pow(10,10),
+    std::pow(10,-10), std::pow(10,10),
+    std::pow(10,-10), std::pow(10,10);
 
   GaussianProcess gp(inputs, observations,
                      std::unique_ptr<CovarianceFunction>(new SquaredExponential()));
 
-  runSimpleGradientAscent(gp, initial_guess, gamma, epsilon);
+  //runSimpleGradientAscent(gp, initial_guess, gamma, epsilon);
+  rProp(gp, initial_guess, gamma, param_limits, epsilon);
 
   // Writing predictions + points
   std::ofstream out;

@@ -63,9 +63,16 @@ public:
       Eigen::VectorXd gamma(3);
       gamma << std::pow(10, -5), std::pow(10,-2), std::pow(10,-2);
       double epsilon = std::pow(10, -6);
+      Eigen::MatrixXd param_limits(3,2);
+      param_limits <<
+        std::pow(10,-10), std::pow(10,10),
+        std::pow(10,-10), std::pow(10,10),
+        std::pow(10,-10), std::pow(10,10);
       // Perform gradients
-      runSimpleGradientAscent(lower_gp, initial_guess, gamma, epsilon);
-      runSimpleGradientAscent(upper_gp, initial_guess, gamma, epsilon);
+      //runSimpleGradientAscent(lower_gp, initial_guess, gamma, epsilon);
+      //runSimpleGradientAscent(upper_gp, initial_guess, gamma, epsilon);
+      rProp(lower_gp, initial_guess, gamma, param_limits, epsilon);
+      rProp(upper_gp, initial_guess, gamma, param_limits, epsilon);
     }
 
   double split;
@@ -113,7 +120,7 @@ int main(int argc, char ** argv)
   Eigen::MatrixXd limits(1,2);
   limits(0,0) = -8;
   limits(0,1) = 8;
-  int nb_samples = 100;
+  int nb_samples = 50;
   int nb_prediction_points = 1000;
   int nb_predictors = 25;
 
@@ -122,17 +129,17 @@ int main(int argc, char ** argv)
 //    {
 //      return std::fabs(input(0));
 //    };
-//  std::function<double(const Eigen::VectorXd &)> f =
-//    [](const Eigen::VectorXd & input)
-//    {
-//      if (input(0) > 0) return 1;
-//      return -1;
-//    };
   std::function<double(const Eigen::VectorXd &)> f =
     [](const Eigen::VectorXd & input)
     {
-      return sin(input(0));
+      if (input(0) > 0) return 1;
+      return -1;
     };
+//  std::function<double(const Eigen::VectorXd &)> f =
+//    [](const Eigen::VectorXd & input)
+//    {
+//      return sin(input(0));
+//    };
 
   // Generating random input
   Eigen::MatrixXd samples = rosban_random::getUniformSamplesMatrix(limits, nb_samples, &engine);
@@ -141,8 +148,10 @@ int main(int argc, char ** argv)
   Eigen::VectorXd observations = rosban_gp::generateObservations(samples, f, 0.05, &engine);
   
   // Generating random splits
-  std::vector<double> splits = rosban_random::getUniformSamples(limits(0,0),
-                                                                limits(0,1),
+  double min_input = samples.minCoeff();
+  double max_input = samples.maxCoeff();
+  std::vector<double> splits = rosban_random::getUniformSamples(min_input,
+                                                                max_input,
                                                                 nb_predictors,
                                                                 &engine);
   // Generate all the MultiGP

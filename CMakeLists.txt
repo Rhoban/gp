@@ -24,6 +24,7 @@ include_directories(
 # Declare a C++ library
 add_library(rosban_gp
   src/rosban_gp/auto_tuning.cpp
+  src/rosban_gp/scoring.cpp
   src/rosban_gp/tools.cpp
   src/rosban_gp/core/covariance_function.cpp
   src/rosban_gp/core/gaussian_process.cpp

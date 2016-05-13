@@ -25,6 +25,9 @@ public:
   /// Set the parameters: [sf, l_1, l_2, ..., l_n]
   void setParameters(const Eigen::VectorXd & parameters) override;
 
+  /// Set the limits for the parameters
+  virtual Eigen::MatrixXd getParametersLimits() const override;
+
   double compute(const Eigen::VectorXd & x1, const Eigen::VectorXd & x2) const override;
 
   Eigen::VectorXd computeGradient(const Eigen::VectorXd & x1,

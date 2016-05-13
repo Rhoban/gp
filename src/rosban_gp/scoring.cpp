@@ -14,8 +14,8 @@ double computeMSE(const Eigen::VectorXd & observations,
 double computeSMSE(const Eigen::VectorXd & observations,
                    const Eigen::VectorXd & predictions)
 {
-  mean_obs = predictions.sum() / predictions.rows();
-  double var = (predictions - mean_obs).squaredNorm();
+  double mean_obs = predictions.sum() / predictions.rows();
+  double var = (predictions - Eigen::VectorXd::Constant(predictions.size(), mean_obs)).squaredNorm();
   return computeMSE(observations, predictions) / var;
 }
 

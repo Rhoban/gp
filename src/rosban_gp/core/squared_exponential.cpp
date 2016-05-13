@@ -39,6 +39,20 @@ void SquaredExponential::setParameters(const Eigen::VectorXd & parameters)
   length_scales = parameters.segment(1, parameters.rows() - 1);
 }
 
+Eigen::MatrixXd SquaredExponential::getParametersLimits() const
+{
+  Eigen::MatrixXd limits(getNbParameters(), 2);
+  // min for sf
+  limits(0) = std::pow(10,-10);
+  // min for l1, l2, ...
+  limits.block(1,0,length_scales.rows(), 1) = Eigen::VectorXd::Constant(length_scales.rows(),
+                                                                        std::pow(10, -10));
+  // max is unlimited
+  limits.col(1) = Eigen::VectorXd::Constant(getNbParameters(),
+                                            std::numeric_limits<double>::max());
+  return limits;
+}
+
 double SquaredExponential::compute(const Eigen::VectorXd & x1,
                                    const Eigen::VectorXd & x2) const
 {

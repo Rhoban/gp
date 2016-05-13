@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Eigen/Core>
 
 namespace rosban_gp
 {

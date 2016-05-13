@@ -23,6 +23,16 @@ public:
   /// Order is as follows: [measurement_noise, covar_parameters]
   void setParameters(const Eigen::VectorXd & parameters);
 
+  /// Return current values for the parameters
+  Eigen::VectorXd getParameters() const;
+
+  /// Return default guess for parameters
+  Eigen::VectorXd getParametersGuess() const;
+  /// Return initial step for rProp
+  Eigen::VectorXd getParametersStep() const;
+  /// Return the limits for the parameters
+  Eigen::MatrixXd getParametersLimits() const;
+
   /// Since modifying the CovarianceFunction requires to set the flags to dirty,
   /// access is const only.
   const CovarianceFunction & getCovarFunc() const;

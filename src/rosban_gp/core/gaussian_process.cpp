@@ -48,6 +48,43 @@ void GaussianProcess::setParameters(const Eigen::VectorXd & parameters)
   setDirty();
 }
 
+Eigen::VectorXd GaussianProcess::getParameters() const
+{
+  const CovarianceFunction & f = getCovarFunc();
+  Eigen::VectorXd parameters(1 + f.getNbParameters());
+  parameters(0) = measurement_noise;
+  parameters.segment(1, f.getNbParameters()) = f.getParameters();
+  return parameters;
+}
+
+Eigen::VectorXd GaussianProcess::getParametersGuess() const
+{
+  const CovarianceFunction & f = getCovarFunc();
+  Eigen::VectorXd guess(1 + f.getNbParameters());
+  guess(0) = 1;
+  guess.segment(1, f.getNbParameters()) = f.getParametersGuess();
+  return guess;
+}
+
+Eigen::VectorXd GaussianProcess::getParametersStep() const
+{
+  const CovarianceFunction & f = getCovarFunc();
+  Eigen::VectorXd step(1 + f.getNbParameters());
+  step(0) = 1;
+  step.segment(1, f.getNbParameters()) = f.getParametersStep();
+  return step;
+}
+
+Eigen::MatrixXd GaussianProcess::getParametersLimits() const
+{
+  const CovarianceFunction & f = getCovarFunc();
+  Eigen::MatrixXd limits(1 + f.getNbParameters(), 2);
+  limits(0,0) = std::pow(10,-10);
+  limits(0,1) = std::numeric_limits<double>::max();
+  limits.block(1,0, f.getNbParameters(), 2) = f.getParametersLimits();
+  return limits;
+}
+
 const CovarianceFunction & GaussianProcess::getCovarFunc() const
 {
   if (!covar_func)

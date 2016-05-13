@@ -7,6 +7,16 @@ double CovarianceFunction::compute(const Eigen::VectorXd & x) const
 {
   return compute(x,x);
 }
+ 
+Eigen::VectorXd CovarianceFunction::getParametersGuess() const
+{
+  return Eigen::VectorXd::Constant(getNbParameters(), 1);
+}
+  
+Eigen::VectorXd CovarianceFunction::getParametersStep() const
+{
+  return Eigen::VectorXd::Constant(getNbParameters(), 1);
+}
 
 Eigen::MatrixXd CovarianceFunction::buildMatrix(const Eigen::MatrixXd & inputs) const
 {

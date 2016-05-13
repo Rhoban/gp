@@ -58,21 +58,12 @@ public:
                                  std::unique_ptr<CovarianceFunction>(new SquaredExponential()));
       upper_gp = GaussianProcess(upper_inputs, upper_obs,
                                  std::unique_ptr<CovarianceFunction>(new SquaredExponential()));
-      // Gradient parameters
-      Eigen::VectorXd initial_guess = Eigen::VectorXd::Constant(3,1);
-      Eigen::VectorXd gamma(3);
-      gamma << std::pow(10, -5), std::pow(10,-2), std::pow(10,-2);
-      double epsilon = std::pow(10, -6);
-      Eigen::MatrixXd param_limits(3,2);
-      param_limits <<
-        std::pow(10,-10), std::pow(10,10),
-        std::pow(10,-10), std::pow(10,10),
-        std::pow(10,-10), std::pow(10,10);
       // Perform gradients
-      //runSimpleGradientAscent(lower_gp, initial_guess, gamma, epsilon);
-      //runSimpleGradientAscent(upper_gp, initial_guess, gamma, epsilon);
-      rProp(lower_gp, initial_guess, gamma, param_limits, epsilon);
-      rProp(upper_gp, initial_guess, gamma, param_limits, epsilon);
+      double epsilon = std::pow(10, -6);
+      rProp(lower_gp, lower_gp.getParametersGuess(), lower_gp.getParametersStep(),
+            lower_gp.getParametersLimits(), epsilon);
+      rProp(upper_gp, upper_gp.getParametersGuess(), upper_gp.getParametersStep(),
+            upper_gp.getParametersLimits(), epsilon);
     }
 
   double split;

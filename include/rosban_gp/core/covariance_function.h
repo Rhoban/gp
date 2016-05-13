@@ -14,6 +14,17 @@ public:
   /// Get the function parameters (order matters)
   virtual Eigen::VectorXd getParameters() const = 0;
 
+  /// Return default guess for parameters
+  virtual Eigen::VectorXd getParametersGuess() const;
+  
+  /// Return initial step for rProp
+  virtual Eigen::VectorXd getParametersStep() const;
+
+  /// Return the limits for the parameters
+  /// No default is provided in order to ensure that each covariance function
+  /// override the function
+  virtual Eigen::MatrixXd getParametersLimits() const = 0;
+
   /// Set the function parameters (order matters)
   virtual void setParameters(const Eigen::VectorXd & parameters) = 0;
 

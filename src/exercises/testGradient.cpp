@@ -54,22 +54,12 @@ int main(int argc, char ** argv)
                                         return -1;
                                       }, 0.05);
 
-  // Optimizing using gradient ascent
-  Eigen::VectorXd initial_guess = Eigen::VectorXd::Constant(3,1);
-  Eigen::VectorXd gamma(3);
-  gamma << std::pow(10, -5), std::pow(10,-2), std::pow(10,-2);
-  double epsilon = std::pow(10, -6);
-  Eigen::MatrixXd param_limits(3,2);
-  param_limits <<
-    std::pow(10,-10), std::pow(10,10),
-    std::pow(10,-10), std::pow(10,10),
-    std::pow(10,-10), std::pow(10,10);
-
   GaussianProcess gp(inputs, observations,
                      std::unique_ptr<CovarianceFunction>(new SquaredExponential()));
-
-  //runSimpleGradientAscent(gp, initial_guess, gamma, epsilon);
-  rProp(gp, initial_guess, gamma, param_limits, epsilon);
+  // Gradient ascent
+  double epsilon = std::pow(10, -6);
+  rProp(gp, gp.getParametersGuess(), gp.getParametersStep(),
+        gp.getParametersLimits(), epsilon);
 
   // Writing predictions + points
   std::ofstream out;

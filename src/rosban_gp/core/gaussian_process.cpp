@@ -33,6 +33,39 @@ GaussianProcess::GaussianProcess(const Eigen::MatrixXd & inputs_,
   setDirty();
 }
 
+GaussianProcess::GaussianProcess(const GaussianProcess & other)
+  : covar_func(std::unique_ptr<CovarianceFunction>(other.covar_func->clone())),
+    measurement_noise(other.measurement_noise),
+    inputs(other.inputs),
+    observations(other.observations),
+    cov(other.cov),
+    inv_cov(other.inv_cov),
+    cholesky(other.cholesky),
+    alpha(other.alpha),
+    dirty_cov(other.dirty_cov),
+    dirty_inv(other.dirty_inv),
+    dirty_cholesky(other.dirty_cholesky),
+    dirty_alpha(other.dirty_alpha)
+{
+}
+
+GaussianProcess& GaussianProcess::operator=(const GaussianProcess& other)
+{
+  this->covar_func = std::unique_ptr<CovarianceFunction>(other.covar_func->clone());
+  this->measurement_noise = other.measurement_noise;
+  this->inputs = other.inputs;
+  this->observations = other.observations;
+  this->cov = other.cov;
+  this->inv_cov = other.inv_cov;
+  this->cholesky = other.cholesky;
+  this->alpha = other.alpha;
+  this->dirty_cov = other.dirty_cov;
+  this->dirty_inv = other.dirty_inv;
+  this->dirty_cholesky = other.dirty_cholesky;
+  this->dirty_alpha = other.dirty_alpha;
+  return *this;
+}
+
 void GaussianProcess::setParameters(const Eigen::VectorXd & parameters)
 {
   int nb_parameters = 1 + getCovarFunc().getNbParameters();
@@ -111,7 +144,21 @@ double GaussianProcess::getPrediction(const Eigen::VectorXd & point)
   return mean;
 }
 
+double GaussianProcess::getPrediction(const Eigen::VectorXd & point) const
+{
+  double mean, var;
+  getDistribParameters(point, mean, var);
+  return mean;
+}
+
 double GaussianProcess::getVariance(const Eigen::VectorXd & point)
+{
+  double mean, var;
+  getDistribParameters(point, mean, var);
+  return var;
+}
+
+double GaussianProcess::getVariance(const Eigen::VectorXd & point) const
 {
   double mean, var;
   getDistribParameters(point, mean, var);
@@ -123,14 +170,27 @@ void GaussianProcess::getDistribParameters(const Eigen::VectorXd & point,
                                            double & mean,
                                            double & var)
 {
-  // Precomputations
-  Eigen::VectorXd k_star = getCovarFunc().buildMatrix(inputs, point);
-  double point_cov = getCovarFunc().compute(point);
-
   // Line 2
   updateCholesky();
   // Line 3
   updateAlpha();
+  // Use the const version since necessary content has been updated
+  ((const GaussianProcess *)this)->getDistribParameters(point, mean, var);
+}
+
+void GaussianProcess::getDistribParameters(const Eigen::VectorXd & point,
+                                           double & mean,
+                                           double & var) const
+{
+  // Precomputations
+  Eigen::VectorXd k_star = getCovarFunc().buildMatrix(inputs, point);
+  double point_cov = getCovarFunc().compute(point);
+
+  // Check that line 2 and 3 have been computed or throw error
+  if (dirty_cholesky || dirty_alpha) {
+    throw std::runtime_error("GaussianProcess::getDistribParameters: precomputations missing");
+  }
+
   // Line 4
   mean = k_star.dot(alpha);
   // Line 5

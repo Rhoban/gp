@@ -18,6 +18,10 @@ public:
   GaussianProcess(const Eigen::MatrixXd & inputs,
                   const Eigen::VectorXd & observations,
                   std::unique_ptr<CovarianceFunction> covar_func);
+  // Enabling copy of GaussianProcess
+  GaussianProcess(const GaussianProcess & other);
+  // Allowing left affectation
+  GaussianProcess & operator=(const GaussianProcess & other);
 
   /// Set the parameters for measurement noise and covariance function
   /// Order is as follows: [measurement_noise, covar_parameters]
@@ -45,14 +49,22 @@ public:
 
   /// Return a prediction of the value at the given point
   double getPrediction(const Eigen::VectorXd & point);
+  /// Throw an error if some parameters are dirty 
+  double getPrediction(const Eigen::VectorXd & point) const;
   /// Return an estimation of the variance at the given point
   double getVariance(const Eigen::VectorXd & point);
+  /// Throw an error if some parameters are dirty 
+  double getVariance(const Eigen::VectorXd & point) const;
 
   /// Compute the parameters of the distribution at the given point and
   /// update the 'mean' and 'var' values accordingly
   void getDistribParameters(const Eigen::VectorXd & point,
                             double & mean,
                             double & var);
+  /// Throw an error if some parameters are dirty 
+  void getDistribParameters(const Eigen::VectorXd & point,
+                            double & mean,
+                            double & var) const;
 
   /// Compute the parameters of the multivariate distribution for the given points
   void getDistribParameters(const Eigen::MatrixXd & points,

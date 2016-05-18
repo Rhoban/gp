@@ -8,6 +8,9 @@ namespace rosban_gp
 class CovarianceFunction
 {
 public:
+  /// Covariance functions need to be cloneable
+  virtual CovarianceFunction * clone() const = 0;
+
   /// Return the number of parameters
   virtual int getNbParameters() const = 0;
 

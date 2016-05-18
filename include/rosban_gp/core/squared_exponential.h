@@ -10,12 +10,13 @@ namespace rosban_gp
 class SquaredExponential : public CovarianceFunction
 {
 public:
-
   SquaredExponential();
   /// Easy access for uni-dimensional input
   SquaredExponential(double length_scale, double process_noise);
   /// Multi-dimensional input
   SquaredExponential(const Eigen::VectorXd & length_scales, double process_noise);
+
+  virtual CovarianceFunction * clone() const override;
 
   int getNbParameters() const override;
 

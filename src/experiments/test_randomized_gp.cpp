@@ -113,7 +113,7 @@ int main(int argc, char ** argv)
   limits(0,1) = 8;
   int nb_samples = 50;
   int nb_prediction_points = 1000;
-  int nb_predictors = 25;
+  int nb_predictors = 100;
 
 //  std::function<double(const Eigen::VectorXd &)> f =
 //    [](const Eigen::VectorXd & input)

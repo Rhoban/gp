@@ -295,6 +295,14 @@ Eigen::VectorXd GaussianProcess::getMarginalLikelihoodGradient()
   return gradient;
 }
 
+void GaussianProcess::updateInternal()
+{
+  updateCov();
+  updateInverse();
+  updateAlpha();
+  updateCholesky();
+}
+
 void GaussianProcess::updateCov()
 {
   if (!dirty_cov) return;

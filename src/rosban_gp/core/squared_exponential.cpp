@@ -54,7 +54,8 @@ Eigen::MatrixXd SquaredExponential::getParametersLimits() const
                                                                         std::pow(10, -10));
   // max is unlimited
   limits.col(1) = Eigen::VectorXd::Constant(getNbParameters(),
-                                            std::numeric_limits<double>::max());
+                                            std::pow(10,10));//This allows to reduce computation time
+  //std::numeric_limits<double>::max());
   return limits;
 }
 

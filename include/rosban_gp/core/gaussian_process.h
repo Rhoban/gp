@@ -88,6 +88,9 @@ public:
   /// parameters of the covariance function
   Eigen::VectorXd getMarginalLikelihoodGradient();
 
+  /// Solve all internal computations
+  void updateInternal();
+
 private:
   /// Update the covariance matrix if required
   void updateCov();

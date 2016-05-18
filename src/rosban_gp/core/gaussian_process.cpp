@@ -103,7 +103,8 @@ Eigen::VectorXd GaussianProcess::getParametersStep() const
 {
   const CovarianceFunction & f = getCovarFunc();
   Eigen::VectorXd step(1 + f.getNbParameters());
-  step(0) = 1;
+  // Since this value has an impact, its default value should be chosen automatically
+  step(0) = std::pow(10,-5);
   step.segment(1, f.getNbParameters()) = f.getParametersStep();
   return step;
 }

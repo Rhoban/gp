@@ -15,7 +15,9 @@ Eigen::VectorXd CovarianceFunction::getParametersGuess() const
   
 Eigen::VectorXd CovarianceFunction::getParametersStep() const
 {
-  return Eigen::VectorXd::Constant(getNbParameters(), 1);
+  // Since this value has an impact, its default value should be chosen automatically
+  double step_default_size = std::pow(10,-2);
+  return Eigen::VectorXd::Constant(getNbParameters(), 1) * step_default_size;
 }
 
 Eigen::MatrixXd CovarianceFunction::buildMatrix(const Eigen::MatrixXd & inputs) const

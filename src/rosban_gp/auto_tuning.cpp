@@ -19,7 +19,7 @@ void runSimpleGradientAscent(GaussianProcess & gp,
     Eigen::VectorXd gradient = gp.getMarginalLikelihoodGradient();
     std::cout << "guess: " << guess.transpose() << std::endl
               << "\tgradient: " << gradient.transpose() << std::endl;
-    // Dirty hack: avoid to reach negative numbers for parameters
+    // Dirty avoid to reach negative numbers for parameters
     Eigen::VectorXd gain = gamma;
     for (int i = 0; i < gradient.rows(); i++)
     {
@@ -75,8 +75,9 @@ void rProp(GaussianProcess & gp,
     // Update guess
     last_guess = guess;
     Eigen::VectorXd delta_guess = grad_signs.cwiseProduct(step_size);
-    std::cout << "guess: " << guess.transpose() << std::endl
-              << "\tdelta: " << delta_guess.transpose() << std::endl;
+    //std::cout << "guess: " << guess.transpose() << std::endl
+    //          << "\tgradient: " << gradient.transpose() << std::endl
+    //          << "\tdelta: " << delta_guess.transpose() << std::endl;
     guess =  guess + delta_guess;
     // Ensure guess does not go outside of limits
     guess = guess.cwiseMin(max_guess).cwiseMax(min_guess);

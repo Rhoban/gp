@@ -50,8 +50,10 @@ Eigen::MatrixXd SquaredExponential::getParametersLimits() const
   // min for sf
   limits(0) = std::pow(10,-10);
   // min for l1, l2, ...
+  // Warning, if we let the minimum be too close to 0, the 'gradient' becomes so
+  // small that it is represented by 0
   limits.block(1,0,length_scales.rows(), 1) = Eigen::VectorXd::Constant(length_scales.rows(),
-                                                                        std::pow(10, -10));
+                                                                        std::pow(10, -2));
   // max is unlimited
   limits.col(1) = Eigen::VectorXd::Constant(getNbParameters(),
                                             std::pow(10,10));//This allows to reduce computation time

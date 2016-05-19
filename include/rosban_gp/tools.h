@@ -2,6 +2,8 @@
 
 #include <Eigen/Core>
 
+#include "rosban_gp/core/gaussian_process.h"
+
 namespace rosban_gp
 {
 
@@ -19,4 +21,13 @@ Eigen::VectorXd generateObservations(const Eigen::MatrixXd & inputs,
                                      std::function<double(double)> f,
                                      double measurement_noise,
                                      std::default_random_engine * engine = NULL);
+
+/// aggregate several gaussian processes to find the parameters of the corresponding
+/// distribution. This methods consider that all the gaussian process where build from
+/// the same set of data, therefore the final variance does not correspond to the one
+/// which should be obtained through convolution
+void getDistribParameters(const Eigen::VectorXd & input,
+                          const std::vector<GaussianProcess> & gps,
+                          double & mean,
+                          double & var);
 }

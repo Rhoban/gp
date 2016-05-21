@@ -71,6 +71,8 @@ void rProp(GaussianProcess & gp,
   
   Eigen::VectorXd last_guess, last_gradient, last_grad_signs;
   // Break in the middle of the loop to avoid code duplication
+  int nb_guess = 0;
+  int max_nb_guess = 100;
   while (true){
     // Update guess
     last_guess = guess;
@@ -85,6 +87,11 @@ void rProp(GaussianProcess & gp,
     gp.setParameters(guess);
     // BREAK CONDITION: diff lower than epsilon
     if ((last_guess-guess).cwiseAbs().maxCoeff() < epsilon) break;
+    if (nb_guess > max_nb_guess)
+    {
+      std::cerr << "breaking rProp after " << nb_guess << std::endl;
+      break;
+    }
     // Update gradient
     last_gradient = gradient;
     last_grad_signs = grad_signs;

@@ -1,6 +1,7 @@
 #include "rosban_gp/tools.h"
 
 #include "rosban_random/tools.h"
+#include <iostream>
 
 namespace rosban_gp
 {

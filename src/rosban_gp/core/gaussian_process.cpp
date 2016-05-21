@@ -187,6 +187,8 @@ void GaussianProcess::getDistribParameters(const Eigen::VectorXd & point,
   Eigen::VectorXd k_star = getCovarFunc().buildMatrix(inputs, point);
   double point_cov = getCovarFunc().compute(point);
 
+  point_cov += std::pow(measurement_noise, 2);
+
   // Check that line 2 and 3 have been computed or throw error
   if (dirty_cholesky || dirty_alpha) {
     throw std::runtime_error("GaussianProcess::getDistribParameters: precomputations missing");

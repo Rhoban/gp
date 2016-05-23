@@ -80,7 +80,7 @@ void getDistribParameters(const Eigen::VectorXd & input,
   Eigen::VectorXd means(nb_predictors);
   Eigen::VectorXd precisions(nb_predictors);
   // Compute values for each predictor
-  for (int i = 0; i < multi_gps.size(); i++)
+  for (size_t i = 0; i < multi_gps.size(); i++)
   {
     MultiGP & gps = multi_gps[i];
     // Choose appropriate gp
@@ -102,7 +102,7 @@ void getDistribParameters(const Eigen::VectorXd & input,
   var = 1.0 / final_precision;
 }
 
-int main(int argc, char ** argv)
+int main()
 {
   // getting random tool
   auto engine = rosban_random::getRandomEngine();

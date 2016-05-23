@@ -14,7 +14,7 @@
 using namespace rosban_gp;
 
 /// This code uses a very simple gradient ascent to find the maximum of the parameters
-int main(int argc, char ** argv)
+int main()
 {
   // Setting problem properties
   Eigen::MatrixXd limits(1,2);

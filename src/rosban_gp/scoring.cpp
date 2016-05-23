@@ -26,6 +26,9 @@ double computeMSLL(const Eigen::MatrixXd & inputs,
                    const Eigen::VectorXd & observations,
                    const Eigen::VectorXd & predictions)
 {
+  (void) inputs;
+  (void) observations;
+  (void) predictions;
   throw std::runtime_error("unimplemented function");
 }
 

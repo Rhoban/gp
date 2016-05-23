@@ -20,6 +20,8 @@ SquaredExponential::SquaredExponential(const Eigen::VectorXd & l, double sf)
 {
 }
 
+SquaredExponential::~SquaredExponential() {}
+
 CovarianceFunction * SquaredExponential::clone() const
 {
   return new SquaredExponential(*this);

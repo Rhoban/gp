@@ -16,7 +16,7 @@ std::default_random_engine getRandomEngine()
   return std::default_random_engine(seed);
 }
 
-int main(int argc, char ** argv)
+int main()
 {
   // Setting problem properties
   double x_min = -8;
@@ -55,7 +55,7 @@ int main(int argc, char ** argv)
     prediction_inputs(0,i) = x;
     x += x_step;
   }
-  for (int i = 0; i < l_values.size(); i++)
+  for (size_t i = 0; i < l_values.size(); i++)
   {
     // Reading hyperparameters
     double l  = l_values[i];

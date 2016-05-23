@@ -8,6 +8,8 @@ namespace rosban_gp
 class CovarianceFunction
 {
 public:
+  virtual ~CovarianceFunction() {}
+
   /// Covariance functions need to be cloneable
   virtual CovarianceFunction * clone() const = 0;
 

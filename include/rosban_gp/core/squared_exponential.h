@@ -16,6 +16,8 @@ public:
   /// Multi-dimensional input
   SquaredExponential(const Eigen::VectorXd & length_scales, double process_noise);
 
+  virtual ~SquaredExponential();
+
   virtual CovarianceFunction * clone() const override;
 
   int getNbParameters() const override;

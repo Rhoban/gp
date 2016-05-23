@@ -15,9 +15,9 @@ namespace rosban_gp
 {
 
 GaussianProcess::GaussianProcess()
-  : dirty_inv(false),
+  : dirty_cov(false),
+    dirty_inv(false),
     dirty_cholesky(false),
-    dirty_cov(false),
     dirty_alpha(false)
 {
 }

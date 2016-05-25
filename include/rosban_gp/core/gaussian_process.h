@@ -56,6 +56,11 @@ public:
   /// Throw an error if some parameters are dirty 
   double getVariance(const Eigen::VectorXd & point) const;
 
+  /// Return the predicted gradient at the given point
+  Eigen::VectorXd getGradient(const Eigen::VectorXd & point);
+  /// Throw an error if some parameters are dirty 
+  Eigen::VectorXd getGradient(const Eigen::VectorXd & point) const;
+
   /// Compute the parameters of the distribution at the given point and
   /// update the 'mean' and 'var' values accordingly
   void getDistribParameters(const Eigen::VectorXd & point,

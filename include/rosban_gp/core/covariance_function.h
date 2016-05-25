@@ -43,6 +43,14 @@ public:
   virtual Eigen::VectorXd computeGradient(const Eigen::VectorXd & x1,
                                           const Eigen::VectorXd & x2) const = 0;
 
+  /// Compute the gradient of the value with respect to the input at the given input
+  /// i.e. derivative over input of k(x*,X), with x* = input and X = points
+  /// Output matrix has:
+  /// - input.rows() rows
+  /// - points.cols() columns
+  virtual Eigen::MatrixXd computeInputGradient(const Eigen::VectorXd & input,
+                                               const Eigen::MatrixXd & points) const = 0;
+
   /// Build a covariance Matrix K such as:
   /// K_{i,j} = covar_func(inputs.col(i), inputs.col(j))
   Eigen::MatrixXd buildMatrix(const Eigen::MatrixXd & inputs) const;

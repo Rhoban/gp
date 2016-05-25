@@ -36,6 +36,9 @@ public:
   Eigen::VectorXd computeGradient(const Eigen::VectorXd & x1,
                                   const Eigen::VectorXd & x2) const override;
 
+  virtual Eigen::MatrixXd computeInputGradient(const Eigen::VectorXd & input,
+                                               const Eigen::MatrixXd & points) const override;
+
 private:
   Eigen::VectorXd length_scales;
   double process_noise;

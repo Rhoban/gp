@@ -85,4 +85,18 @@ Eigen::VectorXd SquaredExponential::computeGradient(const Eigen::VectorXd & x1,
   return gradient;
 }
 
+Eigen::MatrixXd SquaredExponential::computeInputGradient(const Eigen::VectorXd & input,
+                                                         const Eigen::MatrixXd & points) const
+{
+  // delta: D * N Matrix
+  Eigen::MatrixXd result(input.rows(), points.cols());
+  for (int col = 0; col < points.cols(); col++) {
+    Eigen::VectorXd delta = input - points.col(col);
+    // Equivalent to inv(Lambda) * delta (since Lambda is diagonal)
+    Eigen::VectorXd tmp = delta.cwiseQuotient(length_scales);
+    result.col(col) = - tmp * compute(input, points.col(col));
+  }
+  return result;
+}
+
 }

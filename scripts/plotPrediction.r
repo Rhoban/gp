@@ -59,5 +59,7 @@ for (i in 1:length(args))
         g <- g + geom_point(data=observations,mapping=aes(x=input, y=mean),
                             size=10, color="red", shape = '+')
     }
+    print(typeof(data$gradient))
+    g <- g + geom_line(data=data, mapping=aes(x=input, y=gradient), color="blue")
     ggsave(dst)
 }

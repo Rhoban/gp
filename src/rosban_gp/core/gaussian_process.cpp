@@ -166,6 +166,23 @@ double GaussianProcess::getVariance(const Eigen::VectorXd & point) const
   return var;
 }
 
+Eigen::VectorXd GaussianProcess::getGradient(const Eigen::VectorXd & point)
+{
+  updateAlpha();
+
+  Eigen::MatrixXd covarfunc_grad = covar_func->computeInputGradient(point, inputs);
+  return covarfunc_grad * alpha;
+}
+
+Eigen::VectorXd GaussianProcess::getGradient(const Eigen::VectorXd & point) const
+{
+  if (dirty_alpha) {
+    throw std::runtime_error("GaussianProcess::getGradient: precomputations missing");
+  }
+  Eigen::MatrixXd covarfunc_grad = covar_func->computeInputGradient(point, inputs);
+  return covarfunc_grad * alpha;
+}
+
 // Uses Algorithm 2.1 from Rasmussen 2006 (page 19)
 void GaussianProcess::getDistribParameters(const Eigen::VectorXd & point,
                                            double & mean,

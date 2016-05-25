@@ -51,13 +51,14 @@ Eigen::VectorXd cwiseSign(const Eigen::VectorXd v)
   return result;
 }
 
-void rProp(GaussianProcess & gp,
-           const Eigen::VectorXd & initial_guess,
-           const Eigen::VectorXd & initial_step,
-           const Eigen::MatrixXd & limits,
-           double epsilon,
-           double eta_pos,
-           double eta_neg)
+Eigen::VectorXd rProp(std::function<Eigen::VectorXd(const Eigen::VectorXd)> gradient_func,
+                      const Eigen::VectorXd & initial_guess,
+                      const Eigen::VectorXd & initial_step,
+                      const Eigen::MatrixXd & limits,
+                      double epsilon,
+                      int max_nb_guess,
+                      double eta_pos,
+                      double eta_neg)
 {
   // Initializing variables
   Eigen::VectorXd guess = initial_guess;
@@ -65,14 +66,12 @@ void rProp(GaussianProcess & gp,
   Eigen::VectorXd min_guess = limits.col(0);
   Eigen::VectorXd max_guess = limits.col(1);
   // Computing gradient at initial guess
-  gp.setParameters(guess);
-  Eigen::VectorXd gradient = gp.getMarginalLikelihoodGradient();
+  Eigen::VectorXd gradient = gradient_func(guess);
   Eigen::VectorXd grad_signs = cwiseSign(gradient);
   
   Eigen::VectorXd last_guess, last_gradient, last_grad_signs;
   // Break in the middle of the loop to avoid code duplication
   int nb_guess = 0;
-  int max_nb_guess = 1000;
   while (true){
     // Update guess
     last_guess = guess;
@@ -84,7 +83,6 @@ void rProp(GaussianProcess & gp,
     // Ensure guess does not go outside of limits
     guess = guess.cwiseMin(max_guess).cwiseMax(min_guess);
     // Apply new guess
-    gp.setParameters(guess);
     // BREAK CONDITION: diff lower than epsilon
     if ((last_guess-guess).cwiseAbs().maxCoeff() < epsilon) break;
     if (nb_guess > max_nb_guess)
@@ -96,7 +94,7 @@ void rProp(GaussianProcess & gp,
     // Update gradient
     last_gradient = gradient;
     last_grad_signs = grad_signs;
-    gradient = gp.getMarginalLikelihoodGradient();
+    gradient = gradient_func(guess);
     grad_signs = cwiseSign(gradient);
     // Update step size
     for (int i = 0; i < step_size.rows(); i++)
@@ -113,7 +111,31 @@ void rProp(GaussianProcess & gp,
       }
     }
   }
+  return guess;
+}
 
+
+
+Eigen::VectorXd rProp(GaussianProcess & gp,
+                      const Eigen::VectorXd & initial_guess,
+                      const Eigen::VectorXd & initial_step,
+                      const Eigen::MatrixXd & limits,
+                      double epsilon,
+                      int max_nb_guess,
+                      double eta_pos,
+                      double eta_neg)
+{
+  std::function<Eigen::VectorXd(const Eigen::VectorXd &)> grad_func =
+    [&gp](const Eigen::VectorXd & guess)
+    {
+      gp.setParameters(guess);
+      return gp.getMarginalLikelihoodGradient();
+    };
+  
+  Eigen::VectorXd final_guess = rProp(grad_func, initial_guess, initial_step, limits,
+                                      epsilon, max_nb_guess, eta_pos, eta_neg);
+  gp.setParameters(final_guess);
+  return final_guess;
 }
 
 }

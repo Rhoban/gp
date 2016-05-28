@@ -15,7 +15,7 @@ std::default_random_engine getRandomEngine()
 }
 
 /// This code produces figure 5.3.b at page 113 in Rasmussen-2006
-int main(int argc, char ** argv)
+int main()
 {
   // Setting problem properties
   double x_min = -8;

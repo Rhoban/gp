@@ -11,7 +11,7 @@
 using namespace rosban_gp;
 using rosban_random::MultiVariateGaussian;
 
-int main(int argc, char ** argv)
+int main()
 {
   // Setting problem properties
   Eigen::MatrixXd limits(1,2);

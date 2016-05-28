@@ -21,5 +21,4 @@ double computeSMSE(const Eigen::VectorXd & observations,
 double computeMSLL(const Eigen::MatrixXd & inputs,
                    const Eigen::VectorXd & observations,
                    const Eigen::VectorXd & predictions);
-
 }

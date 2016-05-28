@@ -10,7 +10,10 @@ namespace rosban_gp
 class SquaredExponential : public CovarianceFunction
 {
 public:
+  /// Create a SquaredExponential with default values (input dimension = 1
   SquaredExponential();
+  /// Default values
+  SquaredExponential(int nb_dimensions);
   /// Easy access for uni-dimensional input
   SquaredExponential(double length_scale, double process_noise);
   /// Multi-dimensional input

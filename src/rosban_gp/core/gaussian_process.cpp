@@ -6,6 +6,7 @@
 #include <Eigen/LU>       // Required for inverse computation
 #include <Eigen/SVD>      // Required for jacobiSVD
 
+#include <iostream>
 #include <sstream>
 #include <stdexcept>
 
@@ -112,9 +113,10 @@ Eigen::VectorXd GaussianProcess::getParametersStep() const
 Eigen::MatrixXd GaussianProcess::getParametersLimits() const
 {
   const CovarianceFunction & f = getCovarFunc();
+  // If noise is either too high or too low, there are numerical issues resulting with nans and inf
   Eigen::MatrixXd limits(1 + f.getNbParameters(), 2);
   limits(0,0) = std::pow(10,-10);
-  limits(0,1) = std::numeric_limits<double>::max();
+  limits(0,1) = std::pow(10,10);
   limits.block(1,0, f.getNbParameters(), 2) = f.getParametersLimits();
   return limits;
 }
@@ -276,10 +278,16 @@ GaussianProcess::generateValues(const Eigen::MatrixXd & requested_inputs,
 
 double GaussianProcess::getLogMarginalLikelihood()
 {
+  updateCholesky();
   updateAlpha();
   
   // compute second term
   double det = cholesky.diagonal().array().log().sum();
+
+  if (std::isnan(det)) {
+    std::cout << cholesky << std::endl;
+    std::cout << "Parameters: " << getParameters().transpose() << std::endl;
+  }
 
   return -0.5 * observations.dot(alpha) - 0.5 * det - 0.5 * log(2 * M_PI);
 }

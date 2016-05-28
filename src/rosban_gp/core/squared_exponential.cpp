@@ -9,6 +9,11 @@ SquaredExponential::SquaredExponential()
 {
 }
 
+SquaredExponential::SquaredExponential(int nb_dimensions)
+  : SquaredExponential(Eigen::VectorXd::Constant(nb_dimensions,1),1)
+{
+}
+
 SquaredExponential::SquaredExponential(double l, double sf)
   : SquaredExponential(Eigen::VectorXd::Constant(1,l), sf)
 {
@@ -58,7 +63,7 @@ Eigen::MatrixXd SquaredExponential::getParametersLimits() const
                                                                         std::pow(10, -2));
   // max is unlimited
   limits.col(1) = Eigen::VectorXd::Constant(getNbParameters(),
-                                            std::pow(10,10));//This allows to reduce computation time
+                                            std::pow(10,3));//This allows to reduce computation time
   //std::numeric_limits<double>::max());
   return limits;
 }
@@ -66,6 +71,14 @@ Eigen::MatrixXd SquaredExponential::getParametersLimits() const
 double SquaredExponential::compute(const Eigen::VectorXd & x1,
                                    const Eigen::VectorXd & x2) const
 {
+  if (x1.rows() != x2.rows() || x1.rows() != length_scales.rows()) {
+    std::ostringstream oss;
+    oss << "SquaredExponential::compute: size mismatch: " << std::endl
+        << "\tx1.rows() = " << x1.rows() << std::endl
+        << "\tx2.rows() = " << x2.rows() << std::endl
+        << "\tls.rows() = " << length_scales.rows();
+    throw std::runtime_error(oss.str());
+  }
   double s2 = std::pow(process_noise, 2);
   double z = (x1 - x2).cwiseQuotient(length_scales).squaredNorm();
   return s2 * std::exp(-0.5 * z);

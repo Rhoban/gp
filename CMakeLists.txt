@@ -4,6 +4,7 @@ project(rosban_gp)
 find_package(catkin REQUIRED
   cmake_modules
   rosban_random
+  rosban_utils
   )
 
 find_package(Eigen REQUIRED)
@@ -26,6 +27,7 @@ add_library(rosban_gp
   src/rosban_gp/auto_tuning.cpp
   src/rosban_gp/scoring.cpp
   src/rosban_gp/tools.cpp
+  src/rosban_gp/gradient_ascent/rprop.cpp
   src/rosban_gp/core/covariance_function.cpp
   src/rosban_gp/core/gaussian_process.cpp
   src/rosban_gp/core/squared_exponential.cpp

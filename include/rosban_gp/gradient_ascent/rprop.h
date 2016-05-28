@@ -30,7 +30,7 @@ public:
 
     /// Minimal difference with previous guess to continue exploration
     double epsilon;
-    /// Maximal numer of iterations of the algorithm
+    /// Maximal number of iterations of the algorithm
     int max_iterations;
     /// Gain when sign is similar to previous sign
     double eta_pos;

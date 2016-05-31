@@ -27,7 +27,7 @@ void RandomizedRProp::Config::from_xml(TiXmlNode *node)
   rosban_utils::xml_tools::try_read<int>   (node, "nb_trials", nb_trials);
   // If other uses this shared_ptr, avoid to overwrite their data
   rprop_conf = std::shared_ptr<RProp::Config>(new RProp::Config());
-  rprop_conf->read(node, "rprop_conf");
+  rprop_conf->tryRead(node, "rprop_conf");
 }
 
 Eigen::VectorXd RandomizedRProp::run(RProp::GradientFunc gradient_func,

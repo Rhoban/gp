@@ -4,6 +4,8 @@
 
 #include "rosban_gp/core/gaussian_process.h"
 
+#include <random>
+
 namespace rosban_gp
 {
 

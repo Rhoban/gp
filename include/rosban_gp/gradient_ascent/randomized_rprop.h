@@ -27,7 +27,7 @@ public:
   static Eigen::VectorXd run(RProp::GradientFunc gradient_func,
                              ScoringFunc scoring_func,
                              const Eigen::MatrixXd & limits,
-                             std::shared_ptr<Config> conf);
+                             const Config & conf);
 };
 
 }

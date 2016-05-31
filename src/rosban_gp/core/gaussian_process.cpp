@@ -330,6 +330,30 @@ void GaussianProcess::updateInternal()
   updateCholesky();
 }
 
+void GaussianProcess::autoTune(const RandomizedRProp::Config & conf)
+{
+  // Prepare gradient and score functions
+  std::function<Eigen::VectorXd(const Eigen::VectorXd)> gradient_func;
+  std::function<double(const Eigen::VectorXd)> score_func;
+  gradient_func = [this](const Eigen::VectorXd & guess)
+    {
+      this->setParameters(guess);
+      return this->getMarginalLikelihoodGradient();
+    };
+  score_func = [this](const Eigen::VectorXd & guess)
+    {
+      this->setParameters(guess);
+      return this->getLogMarginalLikelihood();
+    };
+  // Use randomized Rprop
+  Eigen::VectorXd best_guess = RandomizedRProp::run(gradient_func,
+                                                    score_func,
+                                                    getParametersLimits(),
+                                                    conf);
+  setParameters(best_guess);
+  updateInternal();
+}
+
 void GaussianProcess::updateCov()
 {
   if (!dirty_cov) return;

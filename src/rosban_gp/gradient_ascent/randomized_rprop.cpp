@@ -33,30 +33,28 @@ void RandomizedRProp::Config::from_xml(TiXmlNode *node)
 Eigen::VectorXd RandomizedRProp::run(RProp::GradientFunc gradient_func,
                                      ScoringFunc scoring_func,
                                      const Eigen::MatrixXd & limits,
-                                     std::shared_ptr<Config> conf)
+                                     const Config & conf)
 {
-  // Create default conf if none is provided
-  if (!conf) conf = std::shared_ptr<Config>(new Config());
   // Defining minimal and maximal initial step sizes
   Eigen::MatrixXd step_size_limits(limits.rows(), limits.cols());
-  step_size_limits.col(0) = Eigen::VectorXd::Constant(limits.rows(), conf->rprop_conf->epsilon);
+  step_size_limits.col(0) = Eigen::VectorXd::Constant(limits.rows(), conf.rprop_conf->epsilon);
   step_size_limits.col(1) = (limits.col(1) - limits.col(0) ) / 100;//100 should go to a variable
   // Creating random initial guesses and random initial steps
   Eigen::MatrixXd initial_guesses;
   Eigen::MatrixXd initial_step_sizes;
-  initial_guesses    = rosban_random::getUniformSamplesMatrix(limits, conf->nb_trials);
-  initial_step_sizes = rosban_random::getUniformSamplesMatrix(step_size_limits, conf->nb_trials);
+  initial_guesses    = rosban_random::getUniformSamplesMatrix(limits, conf.nb_trials);
+  initial_step_sizes = rosban_random::getUniformSamplesMatrix(step_size_limits, conf.nb_trials);
   // Preparing common data
   double best_value = std::numeric_limits<double>::lowest();
   Eigen::VectorXd best_guess = (limits.col(0) + limits.col(1)) / 2;
   // Running several rProp optimization with different starting points
-  for (int trial = 0; trial < conf->nb_trials; trial++) {
+  for (int trial = 0; trial < conf.nb_trials; trial++) {
     Eigen::VectorXd current_guess;
     current_guess = RProp::run(gradient_func,
                                initial_guesses.col(trial),
                                initial_step_sizes.col(trial),
                                limits,
-                               conf->rprop_conf);
+                               conf.rprop_conf);
     double value = scoring_func(current_guess);
     if (value > best_value) {
       best_value = value;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "rosban_gp/core/covariance_function.h"
+#include "rosban_gp/gradient_ascent/randomized_rprop.h"
 
 #include <Eigen/Core>
 
@@ -95,6 +96,10 @@ public:
 
   /// Solve all internal computations
   void updateInternal();
+
+  /// Search the best parameters for fitting using randomized RProp with the
+  /// provided configuration
+  void autoTune(const RandomizedRProp::Config & conf);
 
 private:
   /// Update the covariance matrix if required

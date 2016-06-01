@@ -58,6 +58,10 @@ void getDistribParameters(const Eigen::VectorXd & input,
     // compute values
     double tmp_mean, tmp_var;
     gp.getDistribParameters(input, tmp_mean, tmp_var);
+    // Avoiding 0 variance cases
+    if (tmp_var == 0) {
+      tmp_var = std::pow(10,-20);
+    }
     // Store values
     means(i) = tmp_mean;
     precisions(i) = 1.0 / tmp_var;

@@ -46,11 +46,16 @@ Eigen::VectorXd generateObservations(const Eigen::MatrixXd & inputs,
 void getDistribParameters(const Eigen::VectorXd & input,
                           const std::vector<GaussianProcess> & gps,
                           double & mean,
-                          double & var)
+                          double & var,
+                          std::ostream * output_pointer)
 {
+  bool debug = output_pointer != NULL;
   int nb_predictors = gps.size();
   Eigen::VectorXd means(nb_predictors);
   Eigen::VectorXd precisions(nb_predictors);
+  if (debug) {
+    (*output_pointer) << "Getting distrib parameters for: " << input.transpose() << std::endl;
+  }
   // Compute values for each predictor
   for (size_t i = 0; i < gps.size(); i++)
   {
@@ -65,6 +70,12 @@ void getDistribParameters(const Eigen::VectorXd & input,
     // Store values
     means(i) = tmp_mean;
     precisions(i) = 1.0 / tmp_var;
+    if (debug) {
+      (*output_pointer) << "\tpredictor " << i << ":" << std::endl
+                        << "\t\tparameters: " << gp.getParameters() << std::endl
+                        << "\t\tmean      : " << tmp_mean           << std::endl
+                        << "\t\tvar       : " << tmp_var            << std::endl;
+    }
   }
   // Mix predictors
   Eigen::VectorXd weights = precisions;
@@ -73,6 +84,11 @@ void getDistribParameters(const Eigen::VectorXd & input,
   // Since we artificially create nb_predictions, we cannot simply sum the precisions
   double final_precision = total_weight / nb_predictors;
   var = 1.0 / final_precision;
+  if (debug) {
+    (*output_pointer) << "\tfinal result:" << std::endl
+                      << "\t\tmean: " << mean << std::endl
+                      << "\t\tvar : " << var  << std::endl;
+  }
 }
 
 }

@@ -28,8 +28,10 @@ Eigen::VectorXd generateObservations(const Eigen::MatrixXd & inputs,
 /// distribution. This methods consider that all the gaussian process where build from
 /// the same set of data, therefore the final variance does not correspond to the one
 /// which should be obtained through convolution
+/// If an output stream is provided, then print debug information on it
 void getDistribParameters(const Eigen::VectorXd & input,
                           const std::vector<GaussianProcess> & gps,
                           double & mean,
-                          double & var);
+                          double & var,
+                          std::ostream * output_pointer = NULL);
 }

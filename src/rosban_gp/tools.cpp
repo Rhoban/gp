@@ -72,9 +72,9 @@ void getDistribParameters(const Eigen::VectorXd & input,
     precisions(i) = 1.0 / tmp_var;
     if (debug) {
       (*output_pointer) << "\tpredictor " << i << ":" << std::endl
-                        << "\t\tparameters: " << gp.getParameters() << std::endl
-                        << "\t\tmean      : " << tmp_mean           << std::endl
-                        << "\t\tvar       : " << tmp_var            << std::endl;
+                        << "\t\tparameters: " << gp.getParameters().transpose() << std::endl
+                        << "\t\tmean      : " << tmp_mean                       << std::endl
+                        << "\t\tvar       : " << tmp_var                        << std::endl;
     }
   }
   // Mix predictors
@@ -85,9 +85,15 @@ void getDistribParameters(const Eigen::VectorXd & input,
   double final_precision = total_weight / nb_predictors;
   var = 1.0 / final_precision;
   if (debug) {
+    Eigen::MatrixXd recap(weights.rows(), 2);
+    recap.col(0) = weights;
+    recap.col(1) = means;
+    (*output_pointer) << "\tRecap: (weights, means)" << std::endl
+                      <<
     (*output_pointer) << "\tfinal result:" << std::endl
                       << "\t\tmean: " << mean << std::endl
-                      << "\t\tvar : " << var  << std::endl;
+                      << "\t\tvar : " << var  << std::endl
+                      << "\t\ttotal_weight:" << total_weight << std::endl;
   }
 }
 

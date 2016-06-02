@@ -89,7 +89,7 @@ void getDistribParameters(const Eigen::VectorXd & input,
     recap.col(0) = weights;
     recap.col(1) = means;
     (*output_pointer) << "\tRecap: (weights, means)" << std::endl
-                      <<
+                      << recap << std::endl;
     (*output_pointer) << "\tfinal result:" << std::endl
                       << "\t\tmean: " << mean << std::endl
                       << "\t\tvar : " << var  << std::endl

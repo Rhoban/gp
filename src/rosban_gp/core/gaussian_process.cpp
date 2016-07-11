@@ -1,5 +1,7 @@
 #include "rosban_gp/core/gaussian_process.h"
 
+#include "rosban_gp/core/covariance_function_builder.h"
+
 #include "rosban_random/multivariate_gaussian.h"
 
 #include <Eigen/Cholesky>
@@ -352,6 +354,87 @@ void GaussianProcess::autoTune(const RandomizedRProp::Config & conf)
                                                     conf);
   setParameters(best_guess);
   updateInternal();
+}
+
+int GaussianProcess::write(std::ostream & out)
+{
+  int bytes_written = 0;
+  // Start by updating internal values
+  updateInternal();
+  // Getting important values
+  int input_dim = inputs.rows();
+  int nb_samples = inputs.cols();
+  int nb_samples2 = nb_samples * nb_samples;
+  int cov_id = covar_func->getClassID();
+  Eigen::VectorXd cov_params = covar_func->getParameters();
+  // First write the dimension of input and number of samples
+  bytes_written += rosban_utils::writeInt(out, input_dim);
+  bytes_written += rosban_utils::writeInt(out, nb_samples);
+  // Write the inputs and observations
+  bytes_written += rosban_utils::writeDoubleArray(out, inputs.data(),
+                                                  input_dim * nb_samples);
+  bytes_written += rosban_utils::writeDoubleArray(out, observations.data(),
+                                                  nb_samples);
+  // Write the internal matrices
+  bytes_written += rosban_utils::writeDoubleArray(out, cov.data(),
+                                                  nb_samples2);
+  bytes_written += rosban_utils::writeDoubleArray(out, inv_cov.data(),
+                                                  nb_samples2);
+  bytes_written += rosban_utils::writeDoubleArray(out, cholesky.data(),
+                                                  nb_samples2);
+  bytes_written += rosban_utils::writeDoubleArray(out, alpha.data(),
+                                                  nb_samples);
+  // Write the covariance function, its parameter numbers and its parameters
+  bytes_written += rosban_utils::writeInt(out, cov_id);
+  bytes_written += rosban_utils::writeInt(out, cov_params.rows());
+  bytes_written += rosban_utils::writeDoubleArray(out, cov_params.data(),
+                                                  cov_params.rows());
+  return bytes_written;
+}
+
+int GaussianProcess::read(std::istream & in)
+{
+  int bytes_read = 0;
+  // Variables used through the process
+  int input_dim, nb_samples, nb_samples2, cov_id, cov_nb_params;
+  // Retrieving dimension of input and number of samples
+  bytes_read += rosban_utils::readInt(in, input_dim);
+  bytes_read += rosban_utils::readInt(in, nb_samples);
+  nb_samples2 = nb_samples * nb_samples;
+  // Getting inputs and observations
+  inputs = Eigen::MatrixXd::Zero(input_dim, nb_samples);
+  bytes_read += rosban_utils::readDoubleArray(in, inputs.data(),
+                                              input_dim * nb_samples);
+  observations = Eigen::VectorXd::Zero(nb_samples);
+  bytes_read += rosban_utils::readDoubleArray(in, observations.data(),
+                                              nb_samples);
+  // Read internal matrices
+  cov      = Eigen::MatrixXd::Zero(nb_samples, nb_samples);
+  inv_cov  = Eigen::MatrixXd::Zero(nb_samples, nb_samples);
+  cholesky = Eigen::MatrixXd::Zero(nb_samples, nb_samples);
+  alpha    = Eigen::VectorXd::Zero(nb_samples);
+  bytes_read += rosban_utils::readDoubleArray(in, cov.data(),
+                                              nb_samples2);
+  bytes_read += rosban_utils::readDoubleArray(in, inv_cov.data(),
+                                              nb_samples2);
+  bytes_read += rosban_utils::readDoubleArray(in, cholesky.data(),
+                                              nb_samples2);
+  bytes_read += rosban_utils::readDoubleArray(in, alpha.data(),
+                                              nb_samples);
+  dirty_cov = false;
+  dirty_inv = false;
+  dirty_cholesky=false;
+  dirty_alpha = false;
+  // Read the covariance function and its parameters
+  bytes_read += rosban_utils::readInt(in, cov_id);
+  bytes_read += rosban_utils::readInt(in, cov_nb_params);
+  Eigen::VectorXd cov_params = Eigen::VectorXd::Zero(cov_nb_params);
+  bytes_read += rosban_utils::readDoubleArray(in, cov_params.data(),
+                                              cov_nb_params);
+  CovarianceFunctionBuilder builder;
+  covar_func = std::unique_ptr<CovarianceFunction>(builder.build(cov_id, input_dim));
+  covar_func->setParameters(cov_params);
+  return bytes_read;
 }
 
 void GaussianProcess::updateCov()

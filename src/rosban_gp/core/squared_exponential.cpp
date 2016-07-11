@@ -32,6 +32,11 @@ CovarianceFunction * SquaredExponential::clone() const
   return new SquaredExponential(*this);
 }
 
+int SquaredExponential::getClassID() const
+{
+  return 1;
+}
+
 int SquaredExponential::getNbParameters() const
 {
   return length_scales.rows() + 1;

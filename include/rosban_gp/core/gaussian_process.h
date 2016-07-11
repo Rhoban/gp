@@ -102,6 +102,12 @@ public:
   /// provided configuration
   void autoTune(const RandomizedRProp::Config & conf);
 
+  /// Return the number of bytes written in the stream
+  int write(std::ostream & out);
+
+  /// Return the number of bytes read from the stream
+  int read(std::istream & in);
+
 private:
   /// Update the covariance matrix if required
   void updateCov();

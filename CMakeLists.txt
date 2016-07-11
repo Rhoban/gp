@@ -30,6 +30,7 @@ add_library(rosban_gp
   src/rosban_gp/gradient_ascent/randomized_rprop.cpp
   src/rosban_gp/gradient_ascent/rprop.cpp
   src/rosban_gp/core/covariance_function.cpp
+  src/rosban_gp/core/covariance_function_builder.cpp
   src/rosban_gp/core/gaussian_process.cpp
   src/rosban_gp/core/squared_exponential.cpp
 )
@@ -49,3 +50,6 @@ target_link_libraries(testGradient rosban_gp ${catkin_LIBRARIES})
 
 add_executable(test_randomized_gp src/experiments/test_randomized_gp.cpp)
 target_link_libraries(test_randomized_gp rosban_gp ${catkin_LIBRARIES})
+
+add_executable(test_io src/experiments/test_io.cpp)
+target_link_libraries(test_io rosban_gp ${catkin_LIBRARIES})

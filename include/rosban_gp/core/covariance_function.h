@@ -10,6 +10,9 @@ class CovarianceFunction
 public:
   virtual ~CovarianceFunction() {}
 
+  /// Each covariance function has its own class ID
+  virtual int getClassID() const = 0;
+
   /// Covariance functions need to be cloneable
   virtual CovarianceFunction * clone() const = 0;
 

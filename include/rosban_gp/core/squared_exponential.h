@@ -21,6 +21,8 @@ public:
 
   virtual ~SquaredExponential();
 
+  virtual int getClassID() const override;
+
   virtual CovarianceFunction * clone() const override;
 
   int getNbParameters() const override;

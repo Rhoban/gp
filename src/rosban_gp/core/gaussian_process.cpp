@@ -356,11 +356,9 @@ void GaussianProcess::autoTune(const RandomizedRProp::Config & conf)
   updateInternal();
 }
 
-int GaussianProcess::write(std::ostream & out)
+int GaussianProcess::write(std::ostream & out) const
 {
   int bytes_written = 0;
-  // Start by updating internal values
-  updateInternal();
   // Getting important values
   int input_dim = inputs.rows();
   int nb_samples = inputs.cols();

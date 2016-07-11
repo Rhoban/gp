@@ -103,7 +103,7 @@ public:
   void autoTune(const RandomizedRProp::Config & conf);
 
   /// Return the number of bytes written in the stream
-  int write(std::ostream & out);
+  int write(std::ostream & out) const;
 
   /// Return the number of bytes read from the stream
   int read(std::istream & in);

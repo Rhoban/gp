@@ -35,6 +35,11 @@ Eigen::VectorXd RandomizedRProp::run(RProp::GradientFunc gradient_func,
                                      const Eigen::MatrixXd & limits,
                                      const Config & conf)
 {
+  // DEBUG
+  //std::cout << "auto-tuning with: " << std::endl
+  //          << "\tnb_trials     : " << conf.nb_trials      << std::endl
+  //          << "\tmax_iterations: " << conf.rprop_conf->max_iterations << std::endl
+  //          << "\tepsilon       : " << conf.rprop_conf->epsilon        << std::endl;
   // Defining minimal and maximal initial step sizes
   Eigen::MatrixXd step_size_limits(limits.rows(), limits.cols());
   step_size_limits.col(0) = Eigen::VectorXd::Constant(limits.rows(), conf.rprop_conf->epsilon);

@@ -102,7 +102,7 @@ Eigen::VectorXd RProp::run(std::function<Eigen::VectorXd(const Eigen::VectorXd)>
       if (grad_signs(i) * last_grad_signs(i) < 0) {
         step_size(i) = step_size(i) * conf->eta_neg;
       }
-      // If signd did not change, increase step size
+      // If sign did not change, increase step size
       else if (grad_signs(i) * last_grad_signs(i) > 0) {
         step_size(i) = step_size(i) * conf->eta_pos;
       }

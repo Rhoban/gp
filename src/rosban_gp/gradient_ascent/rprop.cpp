@@ -64,12 +64,12 @@ Eigen::VectorXd RProp::run(std::function<Eigen::VectorXd(const Eigen::VectorXd)>
   // Initialize config if necessary
   if (!conf) conf = std::shared_ptr<Config>(new Config());
   // Initializing variables
-  Eigen::VectorXd guess = initial_guess;
-  Eigen::VectorXd step_size = initial_step_size;
-  Eigen::VectorXd min_guess = limits.col(0);
-  Eigen::VectorXd max_guess = limits.col(1);
-  // Computing gradient at initial guess
-  Eigen::VectorXd gradient = gradient_func(guess);
+  Eigen::VectorXd guess = cvtToTuningSpace(initial_guess, conf);
+  Eigen::VectorXd step_size = cvtToTuningSpace(initial_guess + initial_step_size, conf) - guess;
+  Eigen::VectorXd min_guess = cvtToTuningSpace(limits.col(0), conf);
+  Eigen::VectorXd max_guess = cvtToTuningSpace(limits.col(1), conf);
+  // Computing gradient at initial guess (back in user space)
+  Eigen::VectorXd gradient = gradient_func(cvtFromTuningSpace(guess, conf));
   Eigen::VectorXd grad_signs = cwiseSign(gradient);
   // Loop variables
   Eigen::VectorXd last_guess, last_gradient, last_grad_signs;
@@ -94,7 +94,7 @@ Eigen::VectorXd RProp::run(std::function<Eigen::VectorXd(const Eigen::VectorXd)>
     // Update gradient
     last_gradient = gradient;
     last_grad_signs = grad_signs;
-    gradient = gradient_func(guess);
+    gradient = gradient_func(cvtFromTuningSpace(guess, conf));
     grad_signs = cwiseSign(gradient);
     // Update step size
     for (int i = 0; i < step_size.rows(); i++) {
@@ -108,7 +108,53 @@ Eigen::VectorXd RProp::run(std::function<Eigen::VectorXd(const Eigen::VectorXd)>
       }
     }
   }
-  return guess;
+  // Answer is provided in the user space
+  return cvtFromTuningSpace(guess, conf);
+}
+
+Eigen::VectorXd RProp::cvtFromTuningSpace(const Eigen::VectorXd & v,
+                                          std::shared_ptr<Config> conf)
+{
+  Eigen::VectorXd result = v;
+  if (conf->tuning_space == TuningSpace::Normal) return result;
+  for (int row = 0; row < result.rows(); row++) {
+    result(row) = std::exp(result(row));
+  }
+  return result;
+}
+
+Eigen::VectorXd RProp::cvtToTuningSpace(const Eigen::VectorXd & v,
+                                        std::shared_ptr<Config> conf)
+{
+  Eigen::VectorXd result = v;
+  if (conf->tuning_space == TuningSpace::Normal) return result;
+  for (int row = 0; row < result.rows(); row++) {
+    result(row) = std::log(result(row));
+  }
+  return result;
+}
+
+std::string to_string(RProp::TuningSpace tuning_space)
+{
+  switch (tuning_space)
+  {
+    case RProp::TuningSpace::Normal: return "Normal";
+    case RProp::TuningSpace::Log: return "Log";
+  }
+  throw std::runtime_error("Unknown tuning_space in to_string(RProp::TuningSpace)");
+}
+
+RProp::TuningSpace loadUpdateType(const std::string & tuning_space)
+{
+  if (tuning_space == "Normal")
+  {
+    return RProp::TuningSpace::Normal;
+  }
+  if (tuning_space == "Log")
+  {
+    return RProp::TuningSpace::Log;
+  }
+  throw std::runtime_error("Unknown RProp TuningSpace: '" + tuning_space + "'");
 }
 
 }

@@ -15,6 +15,13 @@ namespace rosban_gp
 class RProp
 {
 public:
+
+  /// For some problems, it is more convenient to tune the parameters in a modified space
+  /// Normal: the user space is conserved
+  /// Log: from user space 'x' to tuning space 'y': y = log(x)
+  enum class TuningSpace
+  { Normal, Log };
+
   /// A gradient func maps an input to the gradient at this input
   typedef std::function<Eigen::VectorXd(const Eigen::VectorXd)> GradientFunc;
 
@@ -29,6 +36,7 @@ public:
     virtual void from_xml(TiXmlNode *node) override;
 
     /// Minimal difference with previous guess to continue exploration
+    /// - Warning: this value is provided in tuning_space
     double epsilon;
     /// Maximal number of iterations of the algorithm
     int max_iterations;
@@ -36,6 +44,8 @@ public:
     double eta_pos;
     /// Gain when sign is different from previous sign
     double eta_neg;
+    /// Which space transformation is used to tune the parameters
+    TuningSpace tuning_space;
   };
 
   static Eigen::VectorXd run(GradientFunc gradient_func,
@@ -44,6 +54,16 @@ public:
                              const Eigen::MatrixXd & limits,
                              std::shared_ptr<Config> conf);
 
+  /// Conversion from the tuning space to user space
+  static Eigen::VectorXd cvtFromTuningSpace(const Eigen::VectorXd & v,
+                                            std::shared_ptr<Config> conf);
+  /// Conversion from user space to tuning Space
+  static Eigen::VectorXd cvtToTuningSpace(const Eigen::VectorXd & v,
+                                          std::shared_ptr<Config> conf);
+
 };
+
+std::string to_string(RProp::TuningSpace tuning_space);
+RProp::TuningSpace loadUpdateType(const std::string & tuning_space);
 
 }

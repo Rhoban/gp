@@ -64,6 +64,6 @@ public:
 };
 
 std::string to_string(RProp::TuningSpace tuning_space);
-RProp::TuningSpace loadUpdateType(const std::string & tuning_space);
+RProp::TuningSpace loadTuningSpace(const std::string & tuning_space);
 
 }

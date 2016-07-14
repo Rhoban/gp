@@ -25,7 +25,8 @@ RProp::Config::Config()
   : epsilon(std::pow(10,-6)),
     max_iterations(1000),
     eta_pos(1.2),
-    eta_neg(0.5)
+    eta_neg(0.5),
+    tuning_space(TuningSpace::Normal)
 {
 }
 
@@ -40,6 +41,7 @@ void RProp::Config::to_xml(std::ostream &out) const
   rosban_utils::xml_tools::write<double>("epsilon"       , epsilon       , out);
   rosban_utils::xml_tools::write<double>("eta_pos"       , eta_pos       , out);
   rosban_utils::xml_tools::write<double>("eta_neg"       , eta_neg       , out);
+  rosban_utils::xml_tools::write<std::string>("tuning_space", to_string(tuning_space), out);
 }
 
 void RProp::Config::from_xml(TiXmlNode *node)
@@ -48,6 +50,9 @@ void RProp::Config::from_xml(TiXmlNode *node)
   rosban_utils::xml_tools::try_read<double>(node, "epsilon"       , epsilon       );
   rosban_utils::xml_tools::try_read<double>(node, "eta_pos"       , eta_pos       );
   rosban_utils::xml_tools::try_read<double>(node, "eta_neg"       , eta_neg       );
+  std::string tuning_space_str;
+  rosban_utils::xml_tools::try_read<std::string>(node, "tuning_space", tuning_space_str);
+  if (tuning_space_str.size() > 0) { tuning_space = loadTuningSpace(tuning_space_str); }
 }
 
 
@@ -144,7 +149,7 @@ std::string to_string(RProp::TuningSpace tuning_space)
   throw std::runtime_error("Unknown tuning_space in to_string(RProp::TuningSpace)");
 }
 
-RProp::TuningSpace loadUpdateType(const std::string & tuning_space)
+RProp::TuningSpace loadTuningSpace(const std::string & tuning_space)
 {
   if (tuning_space == "Normal")
   {

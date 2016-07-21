@@ -51,6 +51,8 @@ public:
   /// Output matrix has:
   /// - input.rows() rows
   /// - points.cols() columns
+  /// Result at row i and col j is:
+  /// - The partial derivative of k(x*, X_j) regarding x*_i
   virtual Eigen::MatrixXd computeInputGradient(const Eigen::VectorXd & input,
                                                const Eigen::MatrixXd & points) const = 0;
 

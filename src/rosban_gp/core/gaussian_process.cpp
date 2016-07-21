@@ -173,7 +173,6 @@ double GaussianProcess::getVariance(const Eigen::VectorXd & point) const
 Eigen::VectorXd GaussianProcess::getGradient(const Eigen::VectorXd & point)
 {
   updateAlpha();
-
   Eigen::MatrixXd covarfunc_grad = covar_func->computeInputGradient(point, inputs);
   return covarfunc_grad * alpha;
 }
@@ -287,6 +286,7 @@ double GaussianProcess::getLogMarginalLikelihood()
   double det = cholesky.diagonal().array().log().sum();
 
   if (std::isnan(det)) {
+    std::cout << "Find a nan value for determinant of cholesky!" << std::endl;
     std::cout << cholesky << std::endl;
     std::cout << "Parameters: " << getParameters().transpose() << std::endl;
   }

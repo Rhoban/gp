@@ -32,6 +32,7 @@ add_library(rosban_gp
   src/rosban_gp/core/covariance_function.cpp
   src/rosban_gp/core/covariance_function_builder.cpp
   src/rosban_gp/core/gaussian_process.cpp
+  src/rosban_gp/core/neural_network.cpp
   src/rosban_gp/core/squared_exponential.cpp
 )
 target_link_libraries(rosban_gp ${catkin_LIBRARIES})
@@ -44,6 +45,9 @@ target_link_libraries(figure2.5 rosban_gp ${catkin_LIBRARIES})
 
 add_executable(figure5.3 src/exercises/figure5.3.cpp)
 target_link_libraries(figure5.3 rosban_gp ${catkin_LIBRARIES})
+
+add_executable(figure5.10 src/exercises/figure5.10.cpp)
+target_link_libraries(figure5.10 rosban_gp ${catkin_LIBRARIES})
 
 add_executable(testGradient src/exercises/testGradient.cpp)
 target_link_libraries(testGradient rosban_gp ${catkin_LIBRARIES})

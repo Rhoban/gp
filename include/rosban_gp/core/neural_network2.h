@@ -6,22 +6,26 @@ namespace rosban_gp
 {
 
 /// Implement the following covariance function:
-/// f(x,x') = sf2 * asin(transpose(x)*P*x' / sqrt[(1+transpose(x)*P*x)*(1+transpose(x')*P*x')])
+/// f(x,x') = 2 / pi * asin(transpose(z)*P*z' / sqrt[(1+transpose(z)*P*z)*(1+transpose(z')*P*z')])
 /// with:
-/// - sf2: control the signal variance
-/// - P: Identity matrix times l^-2
-/// - l: the length scale
-class NeuralNetwork : public CovarianceFunction
+/// - P: diag(u_0, u_1, ..., u_D)
+/// - z: the augmented vector (1 x_1 x_2 ... x_D)
+/// - z': the augmented vector (1 x'_1 x'_2 ... x'_D)
+/// - u_0: offset of the function from origin
+/// - u_i: inverse length scale of dimension i
+class NeuralNetwork2 : public CovarianceFunction
 {
 public:
-  /// Create a NeuralNetwork with default values
-  NeuralNetwork();
+  /// Create a NeuralNetwork2 with default values
+  NeuralNetwork2();
   /// Default values
-  NeuralNetwork(int nb_dimensions);
+  NeuralNetwork2(int nb_dimensions);
+  /// Easy binder for 1D
+  NeuralNetwork2(double u0, double u1);
   /// Set hyper Parameters
-  NeuralNetwork(double process_noise, double length_scale);
+  NeuralNetwork2(const Eigen::VectorXd & parameters);
 
-  virtual ~NeuralNetwork();
+  virtual ~NeuralNetwork2();
 
   virtual int getClassID() const override;
 
@@ -29,10 +33,10 @@ public:
 
   int getNbParameters() const override;
 
-  /// Get the parameters: [sf, l]
+  /// Get the parameters: [u_0, u_1, ..., u_D]
   Eigen::VectorXd getParameters() const override;
 
-  /// Set the parameters: [sf, l]
+  /// Set the parameters: [u_0, u_1, ..., u_D]
   void setParameters(const Eigen::VectorXd & parameters) override;
 
   /// Set the limits for the parameters
@@ -40,6 +44,8 @@ public:
 
   double compute(const Eigen::VectorXd & x1, const Eigen::VectorXd & x2) const override;
 
+
+  // WARNING: Unverified mathematics at work here!!!
   Eigen::VectorXd computeGradient(const Eigen::VectorXd & x1,
                                   const Eigen::VectorXd & x2) const override;
 
@@ -47,8 +53,7 @@ public:
                                                const Eigen::MatrixXd & points) const override;
 
 private:
-  double process_noise;
-  double length_scale;
+  Eigen::VectorXd u;
 };
 
 }

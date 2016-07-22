@@ -3,6 +3,7 @@
 #include "rosban_gp/core/gaussian_process.h"
 #include "rosban_gp/core/squared_exponential.h"
 #include "rosban_gp/core/neural_network.h"
+#include "rosban_gp/core/neural_network2.h"
 #include "rosban_gp/gradient_ascent/randomized_rprop.h"
 
 #include <fstream>
@@ -37,8 +38,7 @@ int main()
   for (int p = 0; p < nb_points; p++) {
     double x = x_distrib(engine);
     double y = 1;
-    if (x < 0.5) { y = -1; }
-    y+=5;
+    if (x < 0) { y = -1; }
     y += noise_distrib(engine);
     out << "observation," << x << "," << y << ",0,0" << std::endl;
     inputs(0,p) = x;
@@ -46,17 +46,18 @@ int main()
   }
 
   // Training GP
-  std::unique_ptr<CovarianceFunction> covar_func(new SquaredExponential());
+  //std::unique_ptr<CovarianceFunction> covar_func(new SquaredExponential());
   //std::unique_ptr<CovarianceFunction> covar_func(new NeuralNetwork());
+  std::unique_ptr<CovarianceFunction> covar_func(new NeuralNetwork2());
   GaussianProcess gp(inputs, observations, std::move(covar_func));
   RandomizedRProp::Config ga_conf;
   ga_conf.nb_trials = 5;
   ga_conf.rprop_conf->max_iterations = 100;
   ga_conf.rprop_conf->tuning_space = RProp::TuningSpace::Log;
   gp.autoTune(ga_conf);
-//  Eigen::VectorXd manual_parameters(3);
-//  manual_parameters << 0.1, 0.5, 0.05;
-//  gp.setParameters(manual_parameters);
+  //Eigen::VectorXd manual_parameters(3);
+  //manual_parameters << 0.1, 100, 100;
+  //gp.setParameters(manual_parameters);
 
   // Writing predictions
   for (int i = 0; i < nb_prediction_points; i++)

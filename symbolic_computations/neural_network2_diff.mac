@@ -1,0 +1,48 @@
+/* @author Ludovic Hofer
+ * This file describe the mathematical model of an IArm robotic arm
+ *
+ * Usage : maxima -b neural_network2_diff.mac
+ */
+
+/* The neural network function in its abreviate form
+ * k(x_1,x_2)
+ * x is the augmented vector (1 x_1)
+ * z is the augmented vector (1 x_2)
+ * P is the Sigma matrix
+ * xPz is x' * P * z
+ * xPx is x' * P * x
+ * zPz is z' * P * z
+ */
+knn: 2 / %pi * asin(xPz / sqrt((1 + xPx) *(1 + zPz)));
+/* Replace expression, exhibiting u_i, x_i and z_i:
+ * For genericity, we ignore the fact that x_0 = 1 and z_0 = 1 */
+knn: knn, xPz = (u_i * x_i * z_i + xQz)
+        , xPx = (u_i * x_i * x_i + xQx)
+        , zPz = (u_i * z_i * z_i + zQz);
+/* Derivate along weight u_i */
+diffKnn: diff(knn, u_i);
+/* Now that we performed the derivative, we can group back results
+ * sxx = xPx + 1
+ * szz = zPz + 1
+ */
+diffKnn: diffKnn, (u_i * x_i * z_i + xQz) = xPz
+                , (u_i * x_i * x_i + xQx + 1) = sxx
+                , (u_i * z_i * z_i + zQz + 1) = szz;
+diffKnn: factor(fullratsimp(diffKnn));
+diffKnn: rootscontract(diffKnn);
+/* xPx is positive (resp. zPz are positive), therefore sxx (resp szz) are positive
+ * thus, we can do substitute: if we do not do this manually there is an issue
+ * WARNING: It is not clear why maxima does not accept this transition,
+ *          is it wrong?
+ */
+diffKnn2: - (sxx * z_i ^2 * xPz + szz * x_i^2 * xPz - 2 * sxx * szz * x_i * z_i)
+         / (%pi * sxx * szz * sqrt(sxx * szz - xPz^2));
+diffKnn2: fullratsimp(diffKnn2);
+diffKnn2: expand(diffKnn2);
+/* We use a simplified form with the following substitution:
+ * A = sqrt(sxx * szz - xPz^2)
+ */
+diffKnn3: ((2 * x_i * z_i) - xPz * (x_i^2/ sxx + z_i^2 / szz)) / (A * %pi);
+/* checking equivalency: */
+diffKnn3: diffKnn3, A = sqrt(sxx * szz - xPz^2);
+expand(diffKnn2 - diffKnn3);

@@ -92,7 +92,7 @@ Eigen::VectorXd RProp::run(std::function<Eigen::VectorXd(const Eigen::VectorXd)>
     if ((last_guess-guess).cwiseAbs().maxCoeff() < conf->epsilon) break;
     if (nb_guess > conf->max_iterations)
     {
-      std::cerr << "breaking rProp after " << nb_guess << std::endl;
+      //std::cerr << "breaking rProp after " << nb_guess << std::endl;
       break;
     }
     nb_guess++;

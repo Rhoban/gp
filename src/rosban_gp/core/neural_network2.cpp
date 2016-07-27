@@ -1,5 +1,6 @@
 #include "rosban_gp/core/neural_network2.h"
 
+#include <iostream>
 
 namespace rosban_gp
 {
@@ -10,8 +11,8 @@ NeuralNetwork2::NeuralNetwork2()
 }
 
 NeuralNetwork2::NeuralNetwork2(int nb_dimensions)
-  : NeuralNetwork2(Eigen::VectorXd::Constant(1.0, nb_dimensions + 1))
 {
+  setDim(nb_dimensions);
 }
 
 NeuralNetwork2::NeuralNetwork2(double u0, double u1)
@@ -32,9 +33,12 @@ CovarianceFunction * NeuralNetwork2::clone() const
   return new NeuralNetwork2(*this);
 }
 
-int NeuralNetwork2::getClassID() const
+void NeuralNetwork2::setDim(int dim)
 {
-  return 3;
+  // If dimension has changed, reset
+  if ( u.rows() != dim + 1) {
+    setParameters(Eigen::VectorXd::Constant(dim + 1, 1));
+  }
 }
 
 int NeuralNetwork2::getNbParameters() const
@@ -147,6 +151,11 @@ Eigen::MatrixXd NeuralNetwork2::computeInputGradient(const Eigen::VectorXd & inp
 {
   (void) input; (void) points;
   throw std::logic_error("NeuralNetwork2::computeInputGradient: unimplemented");
+}
+
+int NeuralNetwork2::getClassID() const
+{
+  return ID::NeuralNetwork2;
 }
 
 }

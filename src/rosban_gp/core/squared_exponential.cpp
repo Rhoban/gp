@@ -1,6 +1,5 @@
 #include "rosban_gp/core/squared_exponential.h"
 
-
 namespace rosban_gp
 {
 
@@ -10,8 +9,8 @@ SquaredExponential::SquaredExponential()
 }
 
 SquaredExponential::SquaredExponential(int nb_dimensions)
-  : SquaredExponential(Eigen::VectorXd::Constant(nb_dimensions,1),1)
 {
+  setDim(nb_dimensions);
 }
 
 SquaredExponential::SquaredExponential(double l, double sf)
@@ -32,9 +31,12 @@ CovarianceFunction * SquaredExponential::clone() const
   return new SquaredExponential(*this);
 }
 
-int SquaredExponential::getClassID() const
+void SquaredExponential::setDim(int dim)
 {
-  return 1;
+  // If dim has changed, reset values
+  if (dim != length_scales.rows()) {
+    setParameters(Eigen::VectorXd::Constant(dim + 1, 1.0));
+  }
 }
 
 int SquaredExponential::getNbParameters() const
@@ -115,6 +117,12 @@ Eigen::MatrixXd SquaredExponential::computeInputGradient(const Eigen::VectorXd &
     result.col(col) = - tmp * compute(input, points.col(col));
   }
   return result;
+}
+
+
+int SquaredExponential::getClassID() const
+{
+  return ID::SquaredExponential;
 }
 
 }

@@ -21,9 +21,9 @@ public:
 
   virtual ~SquaredExponential();
 
-  virtual int getClassID() const override;
-
   virtual CovarianceFunction * clone() const override;
+
+  void setDim(int dim) override;
 
   int getNbParameters() const override;
 
@@ -43,6 +43,8 @@ public:
 
   virtual Eigen::MatrixXd computeInputGradient(const Eigen::VectorXd & input,
                                                const Eigen::MatrixXd & points) const override;
+
+  virtual int getClassID() const override;
 
 private:
   Eigen::VectorXd length_scales;

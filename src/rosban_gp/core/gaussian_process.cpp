@@ -1,6 +1,6 @@
 #include "rosban_gp/core/gaussian_process.h"
 
-#include "rosban_gp/core/covariance_function_builder.h"
+#include "rosban_gp/core/covariance_function_factory.h"
 
 #include "rosban_random/multivariate_gaussian.h"
 
@@ -363,8 +363,6 @@ int GaussianProcess::write(std::ostream & out) const
   int input_dim = inputs.rows();
   int nb_samples = inputs.cols();
   int nb_samples2 = nb_samples * nb_samples;
-  int cov_id = covar_func->getClassID();
-  Eigen::VectorXd cov_params = covar_func->getParameters();
   // First write the dimension of input and number of samples
   bytes_written += rosban_utils::writeInt(out, input_dim);
   bytes_written += rosban_utils::writeInt(out, nb_samples);
@@ -382,11 +380,9 @@ int GaussianProcess::write(std::ostream & out) const
                                                   nb_samples2);
   bytes_written += rosban_utils::writeDoubleArray(out, alpha.data(),
                                                   nb_samples);
-  // Write the covariance function, its parameter numbers and its parameters
-  bytes_written += rosban_utils::writeInt(out, cov_id);
-  bytes_written += rosban_utils::writeInt(out, cov_params.rows());
-  bytes_written += rosban_utils::writeDoubleArray(out, cov_params.data(),
-                                                  cov_params.rows());
+  // Write the measurement_noise and covariance function
+  bytes_written += rosban_utils::write<double>(out, measurement_noise);
+  bytes_written += covar_func->write(out);
   return bytes_written;
 }
 
@@ -423,15 +419,9 @@ int GaussianProcess::read(std::istream & in)
   dirty_inv = false;
   dirty_cholesky=false;
   dirty_alpha = false;
-  // Read the covariance function and its parameters
-  bytes_read += rosban_utils::readInt(in, cov_id);
-  bytes_read += rosban_utils::readInt(in, cov_nb_params);
-  Eigen::VectorXd cov_params = Eigen::VectorXd::Zero(cov_nb_params);
-  bytes_read += rosban_utils::readDoubleArray(in, cov_params.data(),
-                                              cov_nb_params);
-  CovarianceFunctionBuilder builder;
-  covar_func = std::unique_ptr<CovarianceFunction>(builder.build(cov_id, input_dim));
-  covar_func->setParameters(cov_params);
+  // Read measurement_noise and covariance function and its parameters
+  bytes_read += rosban_utils::read<double>(in, &measurement_noise);
+  bytes_read += CovarianceFunctionFactory().read(in, covar_func);
   return bytes_read;
 }
 

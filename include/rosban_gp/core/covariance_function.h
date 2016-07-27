@@ -2,19 +2,22 @@
 
 #include <Eigen/Core>
 
+#include "rosban_utils/stream_serializable.h"
+
 namespace rosban_gp
 {
 
-class CovarianceFunction
+class CovarianceFunction : public rosban_utils::StreamSerializable
 {
 public:
-  virtual ~CovarianceFunction() {}
 
-  /// Each covariance function has its own class ID
-  virtual int getClassID() const = 0;
+  virtual ~CovarianceFunction() {}
 
   /// Covariance functions need to be cloneable
   virtual CovarianceFunction * clone() const = 0;
+
+  /// Inform the covariance function that the number of parameters has changed
+  virtual void setDim(int dim) = 0;
 
   /// Return the number of parameters
   virtual int getNbParameters() const = 0;
@@ -64,6 +67,21 @@ public:
   /// K_{i,j} = covar_func(inputs_a.col(i), inputs_b.col(j))
   Eigen::MatrixXd buildMatrix(const Eigen::MatrixXd & inputs_a,
                               const Eigen::MatrixXd & inputs_b) const;
+
+  // Default implementation of read and setFromStream with following format:
+  // - int: nb_parameters
+  // - double_array: parameters values
+  virtual int writeInternal(std::ostream & out) const override;
+  virtual int read(std::istream & in) override;
+
+  /// List all the existing covariance functions
+  enum ID : int
+  {
+    SquaredExponential = 1,
+      NeuralNetwork = 2,
+      NeuralNetwork2 = 3
+  };
+
 };
 
 }

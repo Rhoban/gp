@@ -30,7 +30,7 @@ add_library(rosban_gp
   src/rosban_gp/gradient_ascent/randomized_rprop.cpp
   src/rosban_gp/gradient_ascent/rprop.cpp
   src/rosban_gp/core/covariance_function.cpp
-  src/rosban_gp/core/covariance_function_builder.cpp
+  src/rosban_gp/core/covariance_function_factory.cpp
   src/rosban_gp/core/gaussian_process.cpp
   src/rosban_gp/core/neural_network.cpp
   src/rosban_gp/core/neural_network2.cpp

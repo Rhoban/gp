@@ -1,18 +1,11 @@
 #include "rosban_gp/core/neural_network.h"
 
-
 namespace rosban_gp
 {
 
 NeuralNetwork::NeuralNetwork()
   : NeuralNetwork(1,1)
 {
-}
-
-NeuralNetwork::NeuralNetwork(int nb_dimensions)
-  : NeuralNetwork(1,1)
-{
-  (void) nb_dimensions;
 }
 
 NeuralNetwork::NeuralNetwork(double sf, double l)
@@ -27,9 +20,10 @@ CovarianceFunction * NeuralNetwork::clone() const
   return new NeuralNetwork(*this);
 }
 
-int NeuralNetwork::getClassID() const
+void NeuralNetwork::setDim(int dim)
 {
-  return 2;
+  // Fixed number of parameters
+  (void) dim;
 }
 
 int NeuralNetwork::getNbParameters() const
@@ -149,6 +143,11 @@ Eigen::MatrixXd NeuralNetwork::computeInputGradient(const Eigen::VectorXd & inpu
 {
   (void) input; (void) points;
   throw std::logic_error("NeuralNetwork::computeInputGradient: unimplemented");
+}
+
+int NeuralNetwork::getClassID() const
+{
+  return ID::NeuralNetwork;
 }
 
 }

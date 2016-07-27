@@ -55,6 +55,30 @@ void RProp::Config::from_xml(TiXmlNode *node)
   if (tuning_space_str.size() > 0) { tuning_space = loadTuningSpace(tuning_space_str); }
 }
 
+int RProp::Config::write(std::ostream & out) const
+{
+  int bytes_written = 0;
+  bytes_written += rosban_utils::write<int>   (out, max_iterations);
+  bytes_written += rosban_utils::write<double>(out, epsilon);
+  bytes_written += rosban_utils::write<double>(out, eta_pos);
+  bytes_written += rosban_utils::write<double>(out, eta_neg);
+  char tmp = static_cast<char>(tuning_space);
+  bytes_written += rosban_utils::write<char>  (out, tmp);
+  return bytes_written;
+}
+
+int RProp::Config::read(std::istream & in)
+{
+  int bytes_read = 0;
+  bytes_read += rosban_utils::read<int>   (in, &max_iterations);
+  bytes_read += rosban_utils::read<double>(in, &epsilon);
+  bytes_read += rosban_utils::read<double>(in, &eta_pos);
+  bytes_read += rosban_utils::read<double>(in, &eta_neg);
+  char tmp;
+  bytes_read += rosban_utils::read<char>  (in, &tmp);
+  tuning_space = static_cast<RProp::TuningSpace>(tmp);
+  return bytes_read;
+}
 
 Eigen::VectorXd RProp::run(std::function<Eigen::VectorXd(const Eigen::VectorXd)> gradient_func,
                            const Eigen::VectorXd & initial_guess,

@@ -19,8 +19,8 @@ public:
   /// For some problems, it is more convenient to tune the parameters in a modified space
   /// Normal: the user space is conserved
   /// Log: from user space 'x' to tuning space 'y': y = log(x)
-  enum class TuningSpace
-  { Normal, Log };
+  enum class TuningSpace : char
+  { Normal = 1, Log = 2 };
 
   /// A gradient func maps an input to the gradient at this input
   typedef std::function<Eigen::VectorXd(const Eigen::VectorXd)> GradientFunc;
@@ -34,6 +34,16 @@ public:
     virtual std::string class_name() const override;
     virtual void to_xml(std::ostream &out) const override;
     virtual void from_xml(TiXmlNode *node) override;
+
+    /// Avoiding that the function from Serializable get hidden
+    using rosban_utils::Serializable::write;
+
+    /// Write a binary stream saving the configuration of the node and all its children
+    /// Return the number of bytes written
+    int write(std::ostream & out) const;
+    /// Read the configuration of the node and all its children from the provided binary stream
+    /// Return the number of bytes read
+    int read(std::istream & in);
 
     /// Minimal difference with previous guess to continue exploration
     /// - Warning: this value is provided in tuning_space

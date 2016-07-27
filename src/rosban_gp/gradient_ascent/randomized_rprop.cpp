@@ -30,6 +30,36 @@ void RandomizedRProp::Config::from_xml(TiXmlNode *node)
   rprop_conf->tryRead(node, "rprop_conf");
 }
 
+int RandomizedRProp::Config::write(std::ostream & out) const
+{
+  int bytes_written = 0;
+  bytes_written += rosban_utils::write<int>(out, nb_trials);
+  char has_custom_rprop = 1;
+  if (!rprop_conf) has_custom_rprop=0;
+  bytes_written += rosban_utils::write<char>(out, has_custom_rprop);
+  if (rprop_conf) bytes_written += rprop_conf->write(out);
+  return bytes_written;
+}
+
+int RandomizedRProp::Config::read(std::istream & in)
+{
+  // first, free internal data if necessary
+  rprop_conf.reset();
+  // then read
+  int bytes_read = 0;
+  bytes_read += rosban_utils::read<int>   (in, &nb_trials);
+  char has_custom_rprop;
+  bytes_read += rosban_utils::read<char>   (in, &has_custom_rprop);
+  if (has_custom_rprop == 1) {
+    rprop_conf.reset(new RProp::Config);
+    bytes_read += rprop_conf->read(in);
+  }
+  else if (has_custom_rprop != 0) {
+    throw std::logic_error("Unexpected value for when reading RandomizedRProp::Config");
+  }
+  return bytes_read;
+}
+
 // NOTE: implementation of tuning space is quite weird in order to avoid
 //       breaking API.
 // TODO: Think about another way once tests have been led

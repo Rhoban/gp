@@ -18,6 +18,17 @@ public:
     virtual void to_xml(std::ostream &out) const override;
     virtual void from_xml(TiXmlNode *node) override;
 
+    /// Avoiding that the functions from Serializable get hidden
+    using rosban_utils::Serializable::write;
+    using rosban_utils::Serializable::read;
+
+    /// Write a binary stream saving the configuration of the node and all its children
+    /// Return the number of bytes written
+    int write(std::ostream & out) const;
+    /// Read the configuration of the node and all its children from the provided binary stream
+    /// Return the number of bytes read
+    int read(std::istream & in);
+
     /// Number of gradient ascent performed
     int nb_trials;
     /// Configuration used for rProp

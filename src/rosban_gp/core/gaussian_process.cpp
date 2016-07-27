@@ -390,7 +390,7 @@ int GaussianProcess::read(std::istream & in)
 {
   int bytes_read = 0;
   // Variables used through the process
-  int input_dim, nb_samples, nb_samples2, cov_id, cov_nb_params;
+  int input_dim, nb_samples, nb_samples2;
   // Retrieving dimension of input and number of samples
   bytes_read += rosban_utils::readInt(in, input_dim);
   bytes_read += rosban_utils::readInt(in, nb_samples);

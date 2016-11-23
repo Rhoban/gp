@@ -14,6 +14,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES rosban_gp
+  CATKIN_DEPENDS rosban_random rosban_utils
 )
 
 include_directories(

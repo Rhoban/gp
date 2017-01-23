@@ -7,8 +7,6 @@ find_package(catkin REQUIRED
   rosban_utils
   )
 
-find_package(Eigen REQUIRED)
-
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
 
 catkin_package(
@@ -20,7 +18,6 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
-  ${EIGEN_INCLUDE_DIR}
 )
 
 # Declare a C++ library

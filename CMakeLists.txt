@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 2.8.3)
 project(rosban_gp)
 
 find_package(catkin REQUIRED
-  cmake_modules
   rosban_random
   rosban_utils
   )

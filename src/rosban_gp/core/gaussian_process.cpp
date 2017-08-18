@@ -12,7 +12,7 @@
 #include <sstream>
 #include <stdexcept>
 
-using rosban_random::MultiVariateGaussian;
+using rosban_random::MultivariateGaussian;
 
 namespace rosban_gp
 {
@@ -260,9 +260,9 @@ GaussianProcess::generateValues(const Eigen::MatrixXd & requested_inputs,
 
   getDistribParameters(requested_inputs, mu, sigma);
 
-  MultiVariateGaussian distrib(mu,sigma);
+  MultivariateGaussian distrib(mu,sigma);
 
-  Eigen::VectorXd values = distrib.getSample(engine);
+  Eigen::VectorXd values = distrib.getSample(&engine);
 
   // Adding measurement noise
   if (add_measurement_noise)

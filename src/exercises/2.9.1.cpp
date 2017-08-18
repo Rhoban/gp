@@ -9,7 +9,7 @@
 #include <chrono>
 
 using namespace rosban_gp;
-using rosban_random::MultiVariateGaussian;
+using rosban_random::MultivariateGaussian;
 
 int main()
 {
@@ -37,7 +37,7 @@ int main()
   Eigen::MatrixXd sigma = covar_func->buildMatrix(input);
 
   std::default_random_engine engine = rosban_random::getRandomEngine();
-  MultiVariateGaussian distrib(mu, sigma);
+  MultivariateGaussian distrib(mu, sigma);
 
   // Samples used
   Eigen::MatrixXd samples(1,5);
@@ -54,7 +54,7 @@ int main()
   prior_out << "func,input,output" << std::endl;
   for (int func_id = 1; func_id <= nb_func; func_id++)
   {
-    Eigen::VectorXd func_values = distrib.getSample(engine);
+    Eigen::VectorXd func_values = distrib.getSample(&engine);
     for (int i = 0; i < nb_points; i++)
     {
       prior_out << "f" << func_id << "," << input(0,i) << "," << func_values(i) << std::endl;

@@ -2,6 +2,8 @@
 
 #include "rosban_random/tools.h"
 
+#include "rhoban_utils/io_tools.h"
+
 namespace rosban_gp
 {
 
@@ -11,32 +13,34 @@ RandomizedRProp::Config::Config()
 {
 }
 
-std::string RandomizedRProp::Config::class_name() const
+std::string RandomizedRProp::Config::getClassName() const
 {
   return "randomized_rprop_config";
 }
 
-void RandomizedRProp::Config::to_xml(std::ostream &out) const
+Json::Value RandomizedRProp::Config::toJson() const
 {
-  rosban_utils::xml_tools::write<int>("nb_trials", nb_trials, out);
-  rprop_conf->write("rprop_conf", out);
+  Json::Value v;
+  v["nb_trials"] = nb_trials;
+  v["rprop_conf"] = rprop_conf->toJson();
+  return v;
 }
 
-void RandomizedRProp::Config::from_xml(TiXmlNode *node)
+void RandomizedRProp::Config::fromJson(const Json::Value & v, const std::string & dir_name)
 {
-  rosban_utils::xml_tools::try_read<int>   (node, "nb_trials", nb_trials);
+  rhoban_utils::tryRead(v, "nb_trials", &nb_trials);
   // If other uses this shared_ptr, avoid to overwrite their data
   rprop_conf = std::shared_ptr<RProp::Config>(new RProp::Config());
-  rprop_conf->tryRead(node, "rprop_conf");
+  rprop_conf->tryRead(v, "rprop_conf", dir_name);
 }
 
 int RandomizedRProp::Config::write(std::ostream & out) const
 {
   int bytes_written = 0;
-  bytes_written += rosban_utils::write<int>(out, nb_trials);
+  bytes_written += rhoban_utils::write<int>(out, nb_trials);
   char has_custom_rprop = 1;
   if (!rprop_conf) has_custom_rprop=0;
-  bytes_written += rosban_utils::write<char>(out, has_custom_rprop);
+  bytes_written += rhoban_utils::write<char>(out, has_custom_rprop);
   if (rprop_conf) bytes_written += rprop_conf->write(out);
   return bytes_written;
 }
@@ -47,9 +51,9 @@ int RandomizedRProp::Config::read(std::istream & in)
   rprop_conf.reset();
   // then read
   int bytes_read = 0;
-  bytes_read += rosban_utils::read<int>   (in, &nb_trials);
+  bytes_read += rhoban_utils::read<int>   (in, &nb_trials);
   char has_custom_rprop;
-  bytes_read += rosban_utils::read<char>   (in, &has_custom_rprop);
+  bytes_read += rhoban_utils::read<char>   (in, &has_custom_rprop);
   if (has_custom_rprop == 1) {
     rprop_conf.reset(new RProp::Config);
     bytes_read += rprop_conf->read(in);

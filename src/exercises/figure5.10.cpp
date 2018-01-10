@@ -7,6 +7,7 @@
 #include "rosban_gp/gradient_ascent/randomized_rprop.h"
 
 #include <fstream>
+#include <iostream>
 
 using namespace rosban_gp;
 

@@ -2,12 +2,12 @@
 
 #include <Eigen/Core>
 
-#include "rosban_utils/stream_serializable.h"
+#include "rhoban_utils/serialization/stream_serializable.h"
 
 namespace rosban_gp
 {
 
-class CovarianceFunction : public rosban_utils::StreamSerializable
+class CovarianceFunction : public rhoban_utils::StreamSerializable
 {
 public:
 

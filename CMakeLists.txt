@@ -3,7 +3,7 @@ project(rosban_gp)
 
 find_package(catkin REQUIRED
   rosban_random
-  rosban_utils
+  rhoban_utils
   )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
@@ -11,7 +11,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES rosban_gp
-  CATKIN_DEPENDS rosban_random rosban_utils
+  CATKIN_DEPENDS rosban_random rhoban_utils
 )
 
 include_directories(

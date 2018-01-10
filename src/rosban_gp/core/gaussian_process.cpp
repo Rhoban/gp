@@ -364,24 +364,24 @@ int GaussianProcess::write(std::ostream & out) const
   int nb_samples = inputs.cols();
   int nb_samples2 = nb_samples * nb_samples;
   // First write the dimension of input and number of samples
-  bytes_written += rosban_utils::writeInt(out, input_dim);
-  bytes_written += rosban_utils::writeInt(out, nb_samples);
+  bytes_written += rhoban_utils::writeInt(out, input_dim);
+  bytes_written += rhoban_utils::writeInt(out, nb_samples);
   // Write the inputs and observations
-  bytes_written += rosban_utils::writeDoubleArray(out, inputs.data(),
+  bytes_written += rhoban_utils::writeDoubleArray(out, inputs.data(),
                                                   input_dim * nb_samples);
-  bytes_written += rosban_utils::writeDoubleArray(out, observations.data(),
+  bytes_written += rhoban_utils::writeDoubleArray(out, observations.data(),
                                                   nb_samples);
   // Write the internal matrices
-  bytes_written += rosban_utils::writeDoubleArray(out, cov.data(),
+  bytes_written += rhoban_utils::writeDoubleArray(out, cov.data(),
                                                   nb_samples2);
-  bytes_written += rosban_utils::writeDoubleArray(out, inv_cov.data(),
+  bytes_written += rhoban_utils::writeDoubleArray(out, inv_cov.data(),
                                                   nb_samples2);
-  bytes_written += rosban_utils::writeDoubleArray(out, cholesky.data(),
+  bytes_written += rhoban_utils::writeDoubleArray(out, cholesky.data(),
                                                   nb_samples2);
-  bytes_written += rosban_utils::writeDoubleArray(out, alpha.data(),
+  bytes_written += rhoban_utils::writeDoubleArray(out, alpha.data(),
                                                   nb_samples);
   // Write the measurement_noise and covariance function
-  bytes_written += rosban_utils::write<double>(out, measurement_noise);
+  bytes_written += rhoban_utils::write<double>(out, measurement_noise);
   bytes_written += covar_func->write(out);
   return bytes_written;
 }
@@ -392,35 +392,35 @@ int GaussianProcess::read(std::istream & in)
   // Variables used through the process
   int input_dim, nb_samples, nb_samples2;
   // Retrieving dimension of input and number of samples
-  bytes_read += rosban_utils::readInt(in, input_dim);
-  bytes_read += rosban_utils::readInt(in, nb_samples);
+  bytes_read += rhoban_utils::readInt(in, input_dim);
+  bytes_read += rhoban_utils::readInt(in, nb_samples);
   nb_samples2 = nb_samples * nb_samples;
   // Getting inputs and observations
   inputs = Eigen::MatrixXd::Zero(input_dim, nb_samples);
-  bytes_read += rosban_utils::readDoubleArray(in, inputs.data(),
+  bytes_read += rhoban_utils::readDoubleArray(in, inputs.data(),
                                               input_dim * nb_samples);
   observations = Eigen::VectorXd::Zero(nb_samples);
-  bytes_read += rosban_utils::readDoubleArray(in, observations.data(),
+  bytes_read += rhoban_utils::readDoubleArray(in, observations.data(),
                                               nb_samples);
   // Read internal matrices
   cov      = Eigen::MatrixXd::Zero(nb_samples, nb_samples);
   inv_cov  = Eigen::MatrixXd::Zero(nb_samples, nb_samples);
   cholesky = Eigen::MatrixXd::Zero(nb_samples, nb_samples);
   alpha    = Eigen::VectorXd::Zero(nb_samples);
-  bytes_read += rosban_utils::readDoubleArray(in, cov.data(),
+  bytes_read += rhoban_utils::readDoubleArray(in, cov.data(),
                                               nb_samples2);
-  bytes_read += rosban_utils::readDoubleArray(in, inv_cov.data(),
+  bytes_read += rhoban_utils::readDoubleArray(in, inv_cov.data(),
                                               nb_samples2);
-  bytes_read += rosban_utils::readDoubleArray(in, cholesky.data(),
+  bytes_read += rhoban_utils::readDoubleArray(in, cholesky.data(),
                                               nb_samples2);
-  bytes_read += rosban_utils::readDoubleArray(in, alpha.data(),
+  bytes_read += rhoban_utils::readDoubleArray(in, alpha.data(),
                                               nb_samples);
   dirty_cov = false;
   dirty_inv = false;
   dirty_cholesky=false;
   dirty_alpha = false;
   // Read measurement_noise and covariance function and its parameters
-  bytes_read += rosban_utils::read<double>(in, &measurement_noise);
+  bytes_read += rhoban_utils::read<double>(in, &measurement_noise);
   bytes_read += CovarianceFunctionFactory().read(in, covar_func);
   return bytes_read;
 }

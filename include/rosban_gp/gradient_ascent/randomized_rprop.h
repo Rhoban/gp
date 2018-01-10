@@ -10,17 +10,16 @@ class RandomizedRProp {
 public:
   typedef std::function<double(const Eigen::VectorXd)> ScoringFunc;
 
-  class Config : public rosban_utils::Serializable {
+  class Config : public rhoban_utils::JsonSerializable {
   public:
     Config();
 
-    virtual std::string class_name() const override;
-    virtual void to_xml(std::ostream &out) const override;
-    virtual void from_xml(TiXmlNode *node) override;
+    virtual std::string getClassName() const override;
+    virtual Json::Value toJson() const override;
+    virtual void fromJson(const Json::Value & v, const std::string & dir_name) override;
 
     /// Avoiding that the functions from Serializable get hidden
-    using rosban_utils::Serializable::write;
-    using rosban_utils::Serializable::read;
+    using rhoban_utils::JsonSerializable::read;
 
     /// Write a binary stream saving the configuration of the node and all its children
     /// Return the number of bytes written

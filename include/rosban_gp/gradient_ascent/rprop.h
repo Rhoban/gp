@@ -1,6 +1,6 @@
 #pragma once
 
-#include "rosban_utils/serializable.h"
+#include "rhoban_utils/serialization/json_serializable.h"
 
 #include <Eigen/Core>
 
@@ -25,18 +25,15 @@ public:
   /// A gradient func maps an input to the gradient at this input
   typedef std::function<Eigen::VectorXd(const Eigen::VectorXd)> GradientFunc;
 
-  class Config : public rosban_utils::Serializable {
+  class Config : public rhoban_utils::JsonSerializable {
   public:
     /// eta_pos and eta_neg are set accrording to the default value suggested in
     /// the wikipedia page
     Config();
 
-    virtual std::string class_name() const override;
-    virtual void to_xml(std::ostream &out) const override;
-    virtual void from_xml(TiXmlNode *node) override;
-
-    /// Avoiding that the function from Serializable get hidden
-    using rosban_utils::Serializable::write;
+    virtual std::string getClassName() const override;
+    virtual Json::Value toJson() const override;
+    virtual void fromJson(const Json::Value & v, const std::string & dir_name) override;
 
     /// Write a binary stream saving the configuration of the node and all its children
     /// Return the number of bytes written

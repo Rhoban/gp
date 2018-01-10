@@ -1,5 +1,7 @@
 #include "rosban_gp/gradient_ascent/rprop.h"
 
+#include "rhoban_utils/io_tools.h"
+
 /// Not available in all Eigen versions
 static Eigen::VectorXd cwiseSign(const Eigen::VectorXd & v)
 {
@@ -30,52 +32,55 @@ RProp::Config::Config()
 {
 }
 
-std::string RProp::Config::class_name() const
+std::string RProp::Config::getClassName() const
 {
   return "rprop_config";
 }
 
-void RProp::Config::to_xml(std::ostream &out) const
+Json::Value RProp::Config::toJson() const
 {
-  rosban_utils::xml_tools::write<int>   ("max_iterations", max_iterations, out);
-  rosban_utils::xml_tools::write<double>("epsilon"       , epsilon       , out);
-  rosban_utils::xml_tools::write<double>("eta_pos"       , eta_pos       , out);
-  rosban_utils::xml_tools::write<double>("eta_neg"       , eta_neg       , out);
-  rosban_utils::xml_tools::write<std::string>("tuning_space", to_string(tuning_space), out);
+  Json::Value v;
+  v["max_iterations"] = max_iterations;
+  v["epsilon"       ] = epsilon       ;
+  v["eta_pos"       ] = eta_pos       ;
+  v["eta_neg"       ] = eta_neg       ;
+  v["tuning_space"  ] = to_string(tuning_space);
+  return v;
 }
 
-void RProp::Config::from_xml(TiXmlNode *node)
+void RProp::Config::fromJson(const Json::Value & v, const std::string & dir_name)
 {
-  rosban_utils::xml_tools::try_read<int>   (node, "max_iterations", max_iterations);
-  rosban_utils::xml_tools::try_read<double>(node, "epsilon"       , epsilon       );
-  rosban_utils::xml_tools::try_read<double>(node, "eta_pos"       , eta_pos       );
-  rosban_utils::xml_tools::try_read<double>(node, "eta_neg"       , eta_neg       );
+  (void)dir_name;
   std::string tuning_space_str;
-  rosban_utils::xml_tools::try_read<std::string>(node, "tuning_space", tuning_space_str);
+  rhoban_utils::tryRead(v, "max_iterations", &max_iterations  );
+  rhoban_utils::tryRead(v, "epsilon"       , &epsilon         );
+  rhoban_utils::tryRead(v, "eta_pos"       , &eta_pos         );
+  rhoban_utils::tryRead(v, "eta_neg"       , &eta_neg         );
+  rhoban_utils::tryRead(v, "tuning_space"  , &tuning_space_str);
   if (tuning_space_str.size() > 0) { tuning_space = loadTuningSpace(tuning_space_str); }
 }
 
 int RProp::Config::write(std::ostream & out) const
 {
   int bytes_written = 0;
-  bytes_written += rosban_utils::write<int>   (out, max_iterations);
-  bytes_written += rosban_utils::write<double>(out, epsilon);
-  bytes_written += rosban_utils::write<double>(out, eta_pos);
-  bytes_written += rosban_utils::write<double>(out, eta_neg);
+  bytes_written += rhoban_utils::write<int>   (out, max_iterations);
+  bytes_written += rhoban_utils::write<double>(out, epsilon);
+  bytes_written += rhoban_utils::write<double>(out, eta_pos);
+  bytes_written += rhoban_utils::write<double>(out, eta_neg);
   char tmp = static_cast<char>(tuning_space);
-  bytes_written += rosban_utils::write<char>  (out, tmp);
+  bytes_written += rhoban_utils::write<char>  (out, tmp);
   return bytes_written;
 }
 
 int RProp::Config::read(std::istream & in)
 {
   int bytes_read = 0;
-  bytes_read += rosban_utils::read<int>   (in, &max_iterations);
-  bytes_read += rosban_utils::read<double>(in, &epsilon);
-  bytes_read += rosban_utils::read<double>(in, &eta_pos);
-  bytes_read += rosban_utils::read<double>(in, &eta_neg);
+  bytes_read += rhoban_utils::read<int>   (in, &max_iterations);
+  bytes_read += rhoban_utils::read<double>(in, &epsilon);
+  bytes_read += rhoban_utils::read<double>(in, &eta_pos);
+  bytes_read += rhoban_utils::read<double>(in, &eta_neg);
   char tmp;
-  bytes_read += rosban_utils::read<char>  (in, &tmp);
+  bytes_read += rhoban_utils::read<char>  (in, &tmp);
   tuning_space = static_cast<RProp::TuningSpace>(tmp);
   return bytes_read;
 }

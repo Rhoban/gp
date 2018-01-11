@@ -19,6 +19,8 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+option(ROSBAN_GP_BUILD_EXPERIMENTS "Building experiments binary" OFF)
+
 # Declare a C++ library
 add_library(rosban_gp
   src/rosban_gp/auto_tuning.cpp
@@ -35,26 +37,28 @@ add_library(rosban_gp
 )
 target_link_libraries(rosban_gp ${catkin_LIBRARIES})
 
-add_executable(2.9.1 src/exercises/2.9.1.cpp)
-target_link_libraries(2.9.1 rosban_gp ${catkin_LIBRARIES})
-
-add_executable(figure2.5 src/exercises/figure2.5.cpp)
-target_link_libraries(figure2.5 rosban_gp ${catkin_LIBRARIES})
-
-add_executable(figure4.5b src/exercises/figure4.5b.cpp)
-target_link_libraries(figure4.5b rosban_gp ${catkin_LIBRARIES})
-
-add_executable(figure5.3 src/exercises/figure5.3.cpp)
-target_link_libraries(figure5.3 rosban_gp ${catkin_LIBRARIES})
-
-add_executable(figure5.10 src/exercises/figure5.10.cpp)
-target_link_libraries(figure5.10 rosban_gp ${catkin_LIBRARIES})
-
-add_executable(testGradient src/exercises/testGradient.cpp)
-target_link_libraries(testGradient rosban_gp ${catkin_LIBRARIES})
-
-add_executable(test_randomized_gp src/experiments/test_randomized_gp.cpp)
-target_link_libraries(test_randomized_gp rosban_gp ${catkin_LIBRARIES})
-
-add_executable(test_io src/experiments/test_io.cpp)
-target_link_libraries(test_io rosban_gp ${catkin_LIBRARIES})
+if(ROSBAN_GP_BUILD_EXPERIMENTS)
+  add_executable(2.9.1 src/exercises/2.9.1.cpp)
+  target_link_libraries(2.9.1 rosban_gp ${catkin_LIBRARIES})
+  
+  add_executable(figure2.5 src/exercises/figure2.5.cpp)
+  target_link_libraries(figure2.5 rosban_gp ${catkin_LIBRARIES})
+  
+  add_executable(figure4.5b src/exercises/figure4.5b.cpp)
+  target_link_libraries(figure4.5b rosban_gp ${catkin_LIBRARIES})
+  
+  add_executable(figure5.3 src/exercises/figure5.3.cpp)
+  target_link_libraries(figure5.3 rosban_gp ${catkin_LIBRARIES})
+  
+  add_executable(figure5.10 src/exercises/figure5.10.cpp)
+  target_link_libraries(figure5.10 rosban_gp ${catkin_LIBRARIES})
+  
+  add_executable(testGradient src/exercises/testGradient.cpp)
+  target_link_libraries(testGradient rosban_gp ${catkin_LIBRARIES})
+  
+  add_executable(test_randomized_gp src/experiments/test_randomized_gp.cpp)
+  target_link_libraries(test_randomized_gp rosban_gp ${catkin_LIBRARIES})
+  
+  add_executable(test_io src/experiments/test_io.cpp)
+  target_link_libraries(test_io rosban_gp ${catkin_LIBRARIES})
+endif()

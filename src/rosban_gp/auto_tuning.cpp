@@ -1,6 +1,6 @@
 #include "rosban_gp/auto_tuning.h"
 
-#include "rosban_random/tools.h"
+#include "rhoban_random/tools.h"
 
 #include <iostream>
 
@@ -199,8 +199,8 @@ Eigen::VectorXd randomizedRProp(std::function<Eigen::VectorXd(const Eigen::Vecto
   // Creating random initial guesses and random initial steps
   Eigen::MatrixXd initial_guesses;
   Eigen::MatrixXd initial_step_sizes;
-  initial_guesses = rosban_random::getUniformSamplesMatrix(limits, nb_trials);
-  initial_step_sizes   = rosban_random::getUniformSamplesMatrix(step_size_limits, nb_trials);
+  initial_guesses = rhoban_random::getUniformSamplesMatrix(limits, nb_trials);
+  initial_step_sizes   = rhoban_random::getUniformSamplesMatrix(step_size_limits, nb_trials);
   // Preparing common data
   double best_value = std::numeric_limits<double>::lowest();
   Eigen::VectorXd best_guess = (limits.col(0) + limits.col(1)) / 2;

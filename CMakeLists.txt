@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(rosban_gp)
 
 find_package(catkin REQUIRED
-  rosban_random
+  rhoban_random
   rhoban_utils
   )
 
@@ -11,7 +11,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES rosban_gp
-  CATKIN_DEPENDS rosban_random rhoban_utils
+  CATKIN_DEPENDS rhoban_random rhoban_utils
 )
 
 include_directories(

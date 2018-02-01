@@ -1,6 +1,6 @@
 /// This file implement the production of the data presented at Figure 2.5 in Rasmussen 2006
 
-#include "rosban_random/multivariate_gaussian.h"
+#include "rhoban_random/multivariate_gaussian.h"
 #include "rosban_gp/core/gaussian_process.h"
 #include "rosban_gp/core/squared_exponential.h"
 

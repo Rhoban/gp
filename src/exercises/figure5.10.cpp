@@ -1,4 +1,4 @@
-#include "rosban_random/tools.h"
+#include "rhoban_random/tools.h"
 
 #include "rosban_gp/core/gaussian_process.h"
 #include "rosban_gp/core/squared_exponential.h"
@@ -20,7 +20,7 @@ int main()
   int nb_prediction_points = 1000;
   double noise_stddev = 0.1;
 
-  auto engine = rosban_random::getRandomEngine();
+  auto engine = rhoban_random::getRandomEngine();
   std::uniform_real_distribution<double> x_distrib(x_min, x_max);
   std::normal_distribution<double> noise_distrib(0, noise_stddev);
 

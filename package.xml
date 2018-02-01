@@ -13,10 +13,10 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>rosban_random</build_depend> <!-- rhoban/rosban_random.git -->
+  <build_depend>rhoban_random</build_depend> <!-- rhobanproject/rhoban_random.git -->
   <build_depend>rhoban_utils</build_depend> <!-- rhobanproject/rhobanutils.git -->
 
-  <run_depend>rosban_random</run_depend>
+  <run_depend>rhoban_random</run_depend>
   <run_depend>rhoban_utils</run_depend>
 
   <export>

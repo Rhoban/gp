@@ -4,7 +4,7 @@
 #include "rosban_gp/auto_tuning.h"
 #include "rosban_gp/tools.h"
 
-#include "rosban_random/tools.h"
+#include "rhoban_random/tools.h"
 
 #include <fstream>
 
@@ -105,7 +105,7 @@ void getDistribParameters(const Eigen::VectorXd & input,
 int main()
 {
   // getting random tool
-  auto engine = rosban_random::getRandomEngine();
+  auto engine = rhoban_random::getRandomEngine();
 
   // Setting problem properties
   Eigen::MatrixXd limits(1,2);
@@ -133,7 +133,7 @@ int main()
 //    };
 
   // Generating random input
-  Eigen::MatrixXd samples = rosban_random::getUniformSamplesMatrix(limits, nb_samples, &engine);
+  Eigen::MatrixXd samples = rhoban_random::getUniformSamplesMatrix(limits, nb_samples, &engine);
 
   // Generating output
   Eigen::VectorXd observations = rosban_gp::generateObservations(samples, f, 0.05, &engine);
@@ -141,7 +141,7 @@ int main()
   // Generating random splits
   double min_input = samples.minCoeff();
   double max_input = samples.maxCoeff();
-  std::vector<double> splits = rosban_random::getUniformSamples(min_input,
+  std::vector<double> splits = rhoban_random::getUniformSamples(min_input,
                                                                 max_input,
                                                                 nb_predictors,
                                                                 &engine);

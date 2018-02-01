@@ -1,4 +1,4 @@
-#include "rosban_random/tools.h"
+#include "rhoban_random/tools.h"
 
 #include "rosban_gp/core/gaussian_process.h"
 #include "rosban_gp/core/neural_network2.h"
@@ -10,7 +10,7 @@ using namespace rosban_gp;
 
 int main()
 {
-  auto engine = rosban_random::getRandomEngine();
+  auto engine = rhoban_random::getRandomEngine();
 
   // Setting problem properties
   double x_min = -5;

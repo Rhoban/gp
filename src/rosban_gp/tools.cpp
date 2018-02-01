@@ -1,6 +1,6 @@
 #include "rosban_gp/tools.h"
 
-#include "rosban_random/tools.h"
+#include "rhoban_random/tools.h"
 #include <iostream>
 
 namespace rosban_gp
@@ -14,7 +14,7 @@ Eigen::VectorXd generateObservations(const Eigen::MatrixXd & inputs,
   bool cleanup = false;
   if (engine == NULL)
   {
-    engine = rosban_random::newRandomEngine();
+    engine = rhoban_random::newRandomEngine();
     cleanup = true;
   }
   std::normal_distribution<double> noise_distrib(0, measurement_noise);

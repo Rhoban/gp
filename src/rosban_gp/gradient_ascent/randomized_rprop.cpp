@@ -1,6 +1,6 @@
 #include "rosban_gp/gradient_ascent/randomized_rprop.h"
 
-#include "rosban_random/tools.h"
+#include "rhoban_random/tools.h"
 
 #include "rhoban_utils/io_tools.h"
 
@@ -91,8 +91,8 @@ Eigen::VectorXd RandomizedRProp::run(RProp::GradientFunc gradient_func,
   // Creating random initial guesses and random initial steps (in tuning space)
   Eigen::MatrixXd initial_guesses;
   Eigen::MatrixXd initial_step_sizes;
-  initial_guesses    = rosban_random::getUniformSamplesMatrix(tuning_space_limits, conf.nb_trials);
-  initial_step_sizes = rosban_random::getUniformSamplesMatrix(step_size_limits, conf.nb_trials);
+  initial_guesses    = rhoban_random::getUniformSamplesMatrix(tuning_space_limits, conf.nb_trials);
+  initial_step_sizes = rhoban_random::getUniformSamplesMatrix(step_size_limits, conf.nb_trials);
   // Preparing common data
   double best_value = std::numeric_limits<double>::lowest();
   Eigen::VectorXd best_guess = (limits.col(0) + limits.col(1)) / 2;

@@ -2,7 +2,7 @@
 
 #include "rosban_gp/core/covariance_function_factory.h"
 
-#include "rosban_random/multivariate_gaussian.h"
+#include "rhoban_random/multivariate_gaussian.h"
 
 #include <Eigen/Cholesky>
 #include <Eigen/LU>       // Required for inverse computation
@@ -12,7 +12,7 @@
 #include <sstream>
 #include <stdexcept>
 
-using rosban_random::MultivariateGaussian;
+using rhoban_random::MultivariateGaussian;
 
 namespace rosban_gp
 {

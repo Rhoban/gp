@@ -3,8 +3,8 @@
 #include "rosban_gp/auto_tuning.h"
 #include "rosban_gp/tools.h"
 
-#include "rosban_random/multivariate_gaussian.h"
-#include "rosban_random/tools.h"
+#include "rhoban_random/multivariate_gaussian.h"
+#include "rhoban_random/tools.h"
 
 #include <functional>
 #include <fstream>
@@ -27,10 +27,10 @@ int main()
   double sn = 0.1;
   double sf = 1;
 
-  auto engine = rosban_random::getRandomEngine();
+  auto engine = rhoban_random::getRandomEngine();
 
   // Generating inputs
-  Eigen::MatrixXd inputs = rosban_random::getUniformSamplesMatrix(limits, nb_points, &engine);
+  Eigen::MatrixXd inputs = rhoban_random::getUniformSamplesMatrix(limits, nb_points, &engine);
 
   // Generating noisy observations
   std::unique_ptr<CovarianceFunction> generative_func(new SquaredExponential(length_scale, sf));

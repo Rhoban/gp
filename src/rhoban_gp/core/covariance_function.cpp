@@ -1,8 +1,8 @@
-#include "rosban_gp/core/covariance_function.h"
+#include "rhoban_gp/core/covariance_function.h"
 
 #include "rhoban_utils/io_tools.h"
 
-namespace rosban_gp
+namespace rhoban_gp
 {
 
 double CovarianceFunction::compute(const Eigen::VectorXd & x) const

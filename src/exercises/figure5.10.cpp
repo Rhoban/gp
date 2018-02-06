@@ -1,15 +1,15 @@
 #include "rhoban_random/tools.h"
 
-#include "rosban_gp/core/gaussian_process.h"
-#include "rosban_gp/core/squared_exponential.h"
-#include "rosban_gp/core/neural_network.h"
-#include "rosban_gp/core/neural_network2.h"
-#include "rosban_gp/gradient_ascent/randomized_rprop.h"
+#include "rhoban_gp/core/gaussian_process.h"
+#include "rhoban_gp/core/squared_exponential.h"
+#include "rhoban_gp/core/neural_network.h"
+#include "rhoban_gp/core/neural_network2.h"
+#include "rhoban_gp/gradient_ascent/randomized_rprop.h"
 
 #include <fstream>
 #include <iostream>
 
-using namespace rosban_gp;
+using namespace rhoban_gp;
 
 int main()
 {

@@ -1,6 +1,6 @@
-#include "rosban_gp/core/neural_network.h"
+#include "rhoban_gp/core/neural_network.h"
 
-namespace rosban_gp
+namespace rhoban_gp
 {
 
 NeuralNetwork::NeuralNetwork()

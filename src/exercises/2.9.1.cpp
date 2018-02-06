@@ -1,5 +1,5 @@
-#include "rosban_gp/core/gaussian_process.h"
-#include "rosban_gp/core/squared_exponential.h"
+#include "rhoban_gp/core/gaussian_process.h"
+#include "rhoban_gp/core/squared_exponential.h"
 
 #include "rhoban_random/multivariate_gaussian.h"
 #include "rhoban_random/tools.h"
@@ -8,7 +8,7 @@
 #include <fstream>
 #include <chrono>
 
-using namespace rosban_gp;
+using namespace rhoban_gp;
 using rhoban_random::MultivariateGaussian;
 
 int main()

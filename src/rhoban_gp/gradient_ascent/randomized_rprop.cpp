@@ -1,10 +1,10 @@
-#include "rosban_gp/gradient_ascent/randomized_rprop.h"
+#include "rhoban_gp/gradient_ascent/randomized_rprop.h"
 
 #include "rhoban_random/tools.h"
 
 #include "rhoban_utils/io_tools.h"
 
-namespace rosban_gp
+namespace rhoban_gp
 {
 
 RandomizedRProp::Config::Config()

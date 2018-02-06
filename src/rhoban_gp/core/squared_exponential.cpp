@@ -1,6 +1,6 @@
-#include "rosban_gp/core/squared_exponential.h"
+#include "rhoban_gp/core/squared_exponential.h"
 
-namespace rosban_gp
+namespace rhoban_gp
 {
 
 SquaredExponential::SquaredExponential()

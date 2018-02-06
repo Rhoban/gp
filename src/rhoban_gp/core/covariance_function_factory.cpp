@@ -1,10 +1,10 @@
-#include "rosban_gp/core/covariance_function_factory.h"
+#include "rhoban_gp/core/covariance_function_factory.h"
 
-#include "rosban_gp/core/neural_network.h"
-#include "rosban_gp/core/neural_network2.h"
-#include "rosban_gp/core/squared_exponential.h"
+#include "rhoban_gp/core/neural_network.h"
+#include "rhoban_gp/core/neural_network2.h"
+#include "rhoban_gp/core/squared_exponential.h"
 
-namespace rosban_gp
+namespace rhoban_gp
 {
 
 CovarianceFunctionFactory::CovarianceFunctionFactory()

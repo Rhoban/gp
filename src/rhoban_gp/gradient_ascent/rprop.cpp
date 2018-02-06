@@ -1,4 +1,4 @@
-#include "rosban_gp/gradient_ascent/rprop.h"
+#include "rhoban_gp/gradient_ascent/rprop.h"
 
 #include "rhoban_utils/io_tools.h"
 
@@ -20,7 +20,7 @@ static Eigen::VectorXd cwiseSign(const Eigen::VectorXd & v)
   }
   return result;
 }
-namespace rosban_gp
+namespace rhoban_gp
 {
 
 RProp::Config::Config()
@@ -93,7 +93,7 @@ Eigen::VectorXd RProp::run(std::function<Eigen::VectorXd(const Eigen::VectorXd)>
 {
   // Check validity of initial_step
   if (initial_step_size.minCoeff() < 0) {
-    throw std::runtime_error("rosban_gp::rProp: negative coeff in initial_step_size forbidden");
+    throw std::runtime_error("rhoban_gp::rProp: negative coeff in initial_step_size forbidden");
   }
   // Initialize config if necessary
   if (!conf) conf = std::shared_ptr<Config>(new Config());

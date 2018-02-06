@@ -7,7 +7,7 @@
 #include <functional>
 #include <memory>
 
-namespace rosban_gp
+namespace rhoban_gp
 {
 
 /// Resilient backpropagation algorithm. It uses momentum and steps are based

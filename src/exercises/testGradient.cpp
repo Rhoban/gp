@@ -1,7 +1,7 @@
-#include "rosban_gp/core/gaussian_process.h"
-#include "rosban_gp/core/squared_exponential.h"
-#include "rosban_gp/auto_tuning.h"
-#include "rosban_gp/tools.h"
+#include "rhoban_gp/core/gaussian_process.h"
+#include "rhoban_gp/core/squared_exponential.h"
+#include "rhoban_gp/auto_tuning.h"
+#include "rhoban_gp/tools.h"
 
 #include "rhoban_random/multivariate_gaussian.h"
 #include "rhoban_random/tools.h"
@@ -11,7 +11,7 @@
 #include <iostream>
 #include <chrono>
 
-using namespace rosban_gp;
+using namespace rhoban_gp;
 
 /// This code uses a very simple gradient ascent to find the maximum of the parameters
 int main()

@@ -1,6 +1,6 @@
-#include "rosban_gp/core/gaussian_process.h"
+#include "rhoban_gp/core/gaussian_process.h"
 
-#include "rosban_gp/core/covariance_function_factory.h"
+#include "rhoban_gp/core/covariance_function_factory.h"
 
 #include "rhoban_random/multivariate_gaussian.h"
 
@@ -14,7 +14,7 @@
 
 using rhoban_random::MultivariateGaussian;
 
-namespace rosban_gp
+namespace rhoban_gp
 {
 
 GaussianProcess::GaussianProcess()

@@ -1,16 +1,16 @@
-#include "rosban_gp/core/gaussian_process.h"
-#include "rosban_gp/core/squared_exponential.h"
+#include "rhoban_gp/core/gaussian_process.h"
+#include "rhoban_gp/core/squared_exponential.h"
 
-#include "rosban_gp/auto_tuning.h"
-#include "rosban_gp/tools.h"
+#include "rhoban_gp/auto_tuning.h"
+#include "rhoban_gp/tools.h"
 
 #include "rhoban_random/tools.h"
 
 #include <fstream>
 
-using rosban_gp::CovarianceFunction;
-using rosban_gp::GaussianProcess;
-using rosban_gp::SquaredExponential;
+using rhoban_gp::CovarianceFunction;
+using rhoban_gp::GaussianProcess;
+using rhoban_gp::SquaredExponential;
 
 // Only valid for uni-dimensional input
 class MultiGP
@@ -136,7 +136,7 @@ int main()
   Eigen::MatrixXd samples = rhoban_random::getUniformSamplesMatrix(limits, nb_samples, &engine);
 
   // Generating output
-  Eigen::VectorXd observations = rosban_gp::generateObservations(samples, f, 0.05, &engine);
+  Eigen::VectorXd observations = rhoban_gp::generateObservations(samples, f, 0.05, &engine);
   
   // Generating random splits
   double min_input = samples.minCoeff();

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "rosban_gp/gradient_ascent/rprop.h"
+#include "rhoban_gp/gradient_ascent/rprop.h"
 
-namespace rosban_gp
+namespace rhoban_gp
 {
 
 /// Run several gradient ascent and keep the best

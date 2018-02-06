@@ -1,8 +1,8 @@
-#include "rosban_gp/core/neural_network2.h"
+#include "rhoban_gp/core/neural_network2.h"
 
 #include <iostream>
 
-namespace rosban_gp
+namespace rhoban_gp
 {
 
 NeuralNetwork2::NeuralNetwork2()

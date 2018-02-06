@@ -1,10 +1,10 @@
-#include "rosban_gp/auto_tuning.h"
+#include "rhoban_gp/auto_tuning.h"
 
 #include "rhoban_random/tools.h"
 
 #include <iostream>
 
-namespace rosban_gp
+namespace rhoban_gp
 {
 
 void runSimpleGradientAscent(GaussianProcess & gp,
@@ -63,7 +63,7 @@ Eigen::VectorXd rProp(std::function<Eigen::VectorXd(const Eigen::VectorXd)> grad
                       double eta_neg)
 {
   if (initial_step_size.minCoeff() < 0) {
-    throw std::runtime_error("rosban_gp::rProp: negative coeff in initial_step_size forbidden");
+    throw std::runtime_error("rhoban_gp::rProp: negative coeff in initial_step_size forbidden");
   }
   // Initializing variables
   Eigen::VectorXd guess = initial_guess;
@@ -207,7 +207,7 @@ Eigen::VectorXd randomizedRProp(std::function<Eigen::VectorXd(const Eigen::Vecto
   // Running several rProp optimization with different starting points
   for (int trial = 0; trial < nb_trials; trial++) {
     Eigen::VectorXd current_guess;
-    current_guess = rosban_gp::rProp(gradient_func,
+    current_guess = rhoban_gp::rProp(gradient_func,
                                      initial_guesses.col(trial),
                                      initial_step_sizes.col(trial),
                                      limits,

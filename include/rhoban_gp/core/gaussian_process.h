@@ -1,7 +1,7 @@
 #pragma once
 
-#include "rosban_gp/core/covariance_function.h"
-#include "rosban_gp/gradient_ascent/randomized_rprop.h"
+#include "rhoban_gp/core/covariance_function.h"
+#include "rhoban_gp/gradient_ascent/randomized_rprop.h"
 
 #include <Eigen/Core>
 
@@ -9,7 +9,7 @@
 #include <memory>
 #include <random>
 
-namespace rosban_gp
+namespace rhoban_gp
 {
 
 class GaussianProcess

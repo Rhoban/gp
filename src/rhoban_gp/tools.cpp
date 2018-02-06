@@ -1,9 +1,9 @@
-#include "rosban_gp/tools.h"
+#include "rhoban_gp/tools.h"
 
 #include "rhoban_random/tools.h"
 #include <iostream>
 
-namespace rosban_gp
+namespace rhoban_gp
 {
 
 Eigen::VectorXd generateObservations(const Eigen::MatrixXd & inputs,

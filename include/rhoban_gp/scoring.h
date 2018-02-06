@@ -2,7 +2,7 @@
 
 #include <Eigen/Core>
 
-namespace rosban_gp
+namespace rhoban_gp
 {
 
 /// Compute the mean squared error

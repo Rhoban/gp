@@ -1,8 +1,8 @@
 #pragma once
 
-#include "rosban_gp/core/gaussian_process.h"
+#include "rhoban_gp/core/gaussian_process.h"
 
-namespace rosban_gp
+namespace rhoban_gp
 {
 
 void runSimpleGradientAscent(GaussianProcess & gp,

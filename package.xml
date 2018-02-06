@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>rosban_gp</name>
+  <name>rhoban_gp</name>
   <version>0.0.0</version>
   <description>This package contains some implementation of Gaussian Processes based on the book of Rasmussen</description>
 
@@ -13,8 +13,8 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>rhoban_random</build_depend> <!-- rhobanproject/rhoban_random.git -->
-  <build_depend>rhoban_utils</build_depend> <!-- rhobanproject/rhobanutils.git -->
+  <build_depend>rhoban_random</build_depend> <!-- rhoban/random.git -->
+  <build_depend>rhoban_utils</build_depend> <!-- rhoban/utils.git -->
 
   <run_depend>rhoban_random</run_depend>
   <run_depend>rhoban_utils</run_depend>

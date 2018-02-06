@@ -1,12 +1,12 @@
-#include "rosban_gp/core/covariance_function_factory.h"
-#include "rosban_gp/core/gaussian_process.h"
+#include "rhoban_gp/core/covariance_function_factory.h"
+#include "rhoban_gp/core/gaussian_process.h"
 
 #include <fstream>
 #include <iostream>
 
-using rosban_gp::CovarianceFunction;
-using rosban_gp::CovarianceFunctionFactory;
-using rosban_gp::GaussianProcess;
+using rhoban_gp::CovarianceFunction;
+using rhoban_gp::CovarianceFunctionFactory;
+using rhoban_gp::GaussianProcess;
 
 int main()
 {
@@ -43,7 +43,7 @@ int main()
     GaussianProcess copy_gp;//Not initialized
 
     // Autotuning original_gp
-    rosban_gp::RandomizedRProp::Config autoTuneConf;
+    rhoban_gp::RandomizedRProp::Config autoTuneConf;
     original_gp.autoTune(autoTuneConf);
 
     // writing original

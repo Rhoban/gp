@@ -2,11 +2,11 @@
 
 #include <Eigen/Core>
 
-#include "rosban_gp/core/gaussian_process.h"
+#include "rhoban_gp/core/gaussian_process.h"
 
 #include <random>
 
-namespace rosban_gp
+namespace rhoban_gp
 {
 
 /// Return a vector v such as:

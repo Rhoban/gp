@@ -1,12 +1,12 @@
 #include "rhoban_random/multivariate_gaussian.h"
-#include "rosban_gp/core/gaussian_process.h"
-#include "rosban_gp/core/squared_exponential.h"
+#include "rhoban_gp/core/gaussian_process.h"
+#include "rhoban_gp/core/squared_exponential.h"
 
 #include <functional>
 #include <fstream>
 #include <chrono>
 
-using namespace rosban_gp;
+using namespace rhoban_gp;
 
 std::default_random_engine getRandomEngine()
 {

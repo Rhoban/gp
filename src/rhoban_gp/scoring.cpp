@@ -1,6 +1,6 @@
-#include "rosban_gp/scoring.h"
+#include "rhoban_gp/scoring.h"
 
-namespace rosban_gp
+namespace rhoban_gp
 {
 
 double computeMSE(const Eigen::VectorXd & observations,

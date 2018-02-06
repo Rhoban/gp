@@ -1,8 +1,8 @@
 #pragma once
 
-#include "rosban_gp/core/covariance_function.h"
+#include "rhoban_gp/core/covariance_function.h"
 
-namespace rosban_gp
+namespace rhoban_gp
 {
 
 /// Implement the following covariance function:

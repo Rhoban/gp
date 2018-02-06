@@ -1,27 +1,25 @@
 #pragma once
 
-#include "rosban_gp/core/covariance_function.h"
+#include "rhoban_gp/core/covariance_function.h"
 
-namespace rosban_gp
+namespace rhoban_gp
 {
 
 /// Implement the following covariance function:
-/// f(x,x') = sf2 * asin(transpose(x)*P*x' / sqrt[(1+transpose(x)*P*x)*(1+transpose(x')*P*x')])
-/// with:
-/// - sf2: control the signal variance
-/// - P: Identity matrix times l^-2
-/// - l: the length scale
-class NeuralNetwork : public CovarianceFunction
+/// f(x,x') = process_noise * e^{-0.5 * sum (|x_i - x'_i|/length_scale)^2}
+class SquaredExponential : public CovarianceFunction
 {
 public:
-  /// Create a NeuralNetwork with default values
-  NeuralNetwork();
+  /// Create a SquaredExponential with default values (input dimension = 1
+  SquaredExponential();
   /// Default values
-  NeuralNetwork(int nb_dimensions);
-  /// Set hyper Parameters
-  NeuralNetwork(double process_noise, double length_scale);
+  SquaredExponential(int nb_dimensions);
+  /// Easy access for uni-dimensional input
+  SquaredExponential(double length_scale, double process_noise);
+  /// Multi-dimensional input
+  SquaredExponential(const Eigen::VectorXd & length_scales, double process_noise);
 
-  virtual ~NeuralNetwork();
+  virtual ~SquaredExponential();
 
   virtual CovarianceFunction * clone() const override;
 
@@ -29,10 +27,10 @@ public:
 
   int getNbParameters() const override;
 
-  /// Get the parameters: [sf, l]
+  /// Get the parameters: [sf, l_1, l_2, ..., l_n]
   Eigen::VectorXd getParameters() const override;
 
-  /// Set the parameters: [sf, l]
+  /// Set the parameters: [sf, l_1, l_2, ..., l_n]
   void setParameters(const Eigen::VectorXd & parameters) override;
 
   /// Set the limits for the parameters
@@ -49,8 +47,8 @@ public:
   virtual int getClassID() const override;
 
 private:
+  Eigen::VectorXd length_scales;
   double process_noise;
-  double length_scale;
 };
 
 }

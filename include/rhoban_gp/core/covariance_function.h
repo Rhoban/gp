@@ -4,7 +4,7 @@
 
 #include "rhoban_utils/serialization/stream_serializable.h"
 
-namespace rosban_gp
+namespace rhoban_gp
 {
 
 class CovarianceFunction : public rhoban_utils::StreamSerializable

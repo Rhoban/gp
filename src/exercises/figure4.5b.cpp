@@ -17,7 +17,7 @@ int main()
   double x_max = 5;
   int nb_points = 500;
   double sigma0 = 2;
-  std::vector<double> sigmas = {1,3,10};
+  std::vector<double> sigmas = { 1, 3, 10 };
 
   // Computing file path
   std::ostringstream path;
@@ -33,13 +33,13 @@ int main()
   for (int i = 0; i < nb_points; i++)
   {
     double x = x_min + i * (x_max - x_min) / (nb_points - 1);
-    inputs(0,i) = x;
+    inputs(0, i) = x;
   }
 
-  for (double sigma : sigmas) {
+  for (double sigma : sigmas)
+  {
     // Initializing GP
-    std::unique_ptr<CovarianceFunction> covar_func(new NeuralNetwork2(std::pow(sigma0,2),
-                                                                      std::pow(sigma ,2)));
+    std::unique_ptr<CovarianceFunction> covar_func(new NeuralNetwork2(std::pow(sigma0, 2), std::pow(sigma, 2)));
     GaussianProcess gp(Eigen::MatrixXd(), Eigen::VectorXd(), std::move(covar_func));
 
     Eigen::VectorXd observations = gp.generateValues(inputs, engine, false);
@@ -47,7 +47,7 @@ int main()
     // Writing predictions
     for (int i = 0; i < nb_points; i++)
     {
-      out << "sigma=" << sigma << "," << inputs(0,i) << "," << observations(i) << std::endl;
+      out << "sigma=" << sigma << "," << inputs(0, i) << "," << observations(i) << std::endl;
     }
   }
 }

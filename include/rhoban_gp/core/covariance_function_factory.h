@@ -8,11 +8,10 @@
 
 namespace rhoban_gp
 {
-
 class CovarianceFunctionFactory : public rhoban_utils::Factory<CovarianceFunction>
 {
 public:
   CovarianceFunctionFactory();
 };
 
-}
+}  // namespace rhoban_gp

@@ -14,20 +14,20 @@ using rhoban_random::MultivariateGaussian;
 int main()
 {
   // Setting problem properties
-  Eigen::MatrixXd limits(1,2);
-  limits(0,0) = -5;
-  limits(0,1) = 5;
+  Eigen::MatrixXd limits(1, 2);
+  limits(0, 0) = -5;
+  limits(0, 1) = 5;
   // Parameters
   int nb_points = 1000;
   int nb_func = 5;
 
   // Generating input
   Eigen::MatrixXd input(1, nb_points);
-  double x = limits(0,0);
-  double x_step = (limits(0,1) - limits(0,0)) / nb_points;
+  double x = limits(0, 0);
+  double x_step = (limits(0, 1) - limits(0, 0)) / nb_points;
   for (int i = 0; i < nb_points; i++)
   {
-    input(0,i) = x;
+    input(0, i) = x;
     x += x_step;
   }
 
@@ -40,7 +40,7 @@ int main()
   MultivariateGaussian distrib(mu, sigma);
 
   // Samples used
-  Eigen::MatrixXd samples(1,5);
+  Eigen::MatrixXd samples(1, 5);
   Eigen::VectorXd observations(5);
   samples << -4, -3, 0, 2, 3;
   observations << -1.5, -1, 1, 0.5, 0;
@@ -57,7 +57,7 @@ int main()
     Eigen::VectorXd func_values = distrib.getSample(&engine);
     for (int i = 0; i < nb_points; i++)
     {
-      prior_out << "f" << func_id << "," << input(0,i) << "," << func_values(i) << std::endl;
+      prior_out << "f" << func_id << "," << input(0, i) << "," << func_values(i) << std::endl;
     }
   }
   prior_out.close();
@@ -71,7 +71,7 @@ int main()
     Eigen::VectorXd func_values = gp.generateValues(input, engine);
     for (int i = 0; i < nb_points; i++)
     {
-      posterior_out << "f" << func_id << "," << input(0,i) << "," << func_values(i) << std::endl;
+      posterior_out << "f" << func_id << "," << input(0, i) << "," << func_values(i) << std::endl;
     }
   }
   posterior_out.close();
@@ -88,9 +88,8 @@ int main()
       double interval = 2 * std::sqrt(var);
       double min = mean - interval;
       double max = mean + interval;
-      prediction_out << input(0,i) << "," << mean << "," << min << "," << max << std::endl;
+      prediction_out << input(0, i) << "," << mean << "," << min << "," << max << std::endl;
     }
   }
   prediction_out.close();
-
 }

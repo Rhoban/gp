@@ -16,65 +16,61 @@ using rhoban_gp::SquaredExponential;
 class MultiGP
 {
 public:
-  MultiGP(const Eigen::MatrixXd & inputs,
-          const Eigen::VectorXd & observations,
-          double split_)
-    : split(split_)
+  MultiGP(const Eigen::MatrixXd& inputs, const Eigen::VectorXd& observations, double split_) : split(split_)
+  {
+    // Splitting indexes
+    std::vector<int> idx_lower;
+    std::vector<int> idx_upper;
+    for (int col = 0; col < inputs.cols(); col++)
     {
-      // Splitting indexes
-      std::vector<int> idx_lower;
-      std::vector<int> idx_upper;
-      for (int col = 0; col < inputs.cols(); col++)
+      if (inputs(0, col) > split)
       {
-        if (inputs(0, col) > split) {
-          idx_upper.push_back(col);
-        }
-        else {
-          idx_lower.push_back(col);
-        }
+        idx_upper.push_back(col);
       }
-      // Building new inputs / observetions
-      Eigen::MatrixXd lower_inputs(1, idx_lower.size());
-      Eigen::MatrixXd upper_inputs(1, idx_upper.size());
-      Eigen::VectorXd lower_obs(idx_lower.size());
-      Eigen::VectorXd upper_obs(idx_upper.size());
-      int lower_i = 0;
-      int upper_i = 0;
-      for (int col = 0; col < inputs.cols(); col++)
+      else
       {
-        if (inputs(0,col) > split) {
-          upper_inputs(0, upper_i) = inputs(0, col);
-          upper_obs(upper_i) = observations(col);
-          upper_i++;
-        }
-        else {
-          lower_inputs(0, lower_i) = inputs(0, col);
-          lower_obs(lower_i) = observations(col);
-          lower_i++;
-        }
+        idx_lower.push_back(col);
       }
-      // Building GP + training
-      lower_gp = GaussianProcess(lower_inputs, lower_obs,
-                                 std::unique_ptr<CovarianceFunction>(new SquaredExponential()));
-      upper_gp = GaussianProcess(upper_inputs, upper_obs,
-                                 std::unique_ptr<CovarianceFunction>(new SquaredExponential()));
-      // Perform gradients
-      double epsilon = std::pow(10, -6);
-      rProp(lower_gp, lower_gp.getParametersGuess(), lower_gp.getParametersStep(),
-            lower_gp.getParametersLimits(), epsilon);
-      rProp(upper_gp, upper_gp.getParametersGuess(), upper_gp.getParametersStep(),
-            upper_gp.getParametersLimits(), epsilon);
     }
+    // Building new inputs / observetions
+    Eigen::MatrixXd lower_inputs(1, idx_lower.size());
+    Eigen::MatrixXd upper_inputs(1, idx_upper.size());
+    Eigen::VectorXd lower_obs(idx_lower.size());
+    Eigen::VectorXd upper_obs(idx_upper.size());
+    int lower_i = 0;
+    int upper_i = 0;
+    for (int col = 0; col < inputs.cols(); col++)
+    {
+      if (inputs(0, col) > split)
+      {
+        upper_inputs(0, upper_i) = inputs(0, col);
+        upper_obs(upper_i) = observations(col);
+        upper_i++;
+      }
+      else
+      {
+        lower_inputs(0, lower_i) = inputs(0, col);
+        lower_obs(lower_i) = observations(col);
+        lower_i++;
+      }
+    }
+    // Building GP + training
+    lower_gp = GaussianProcess(lower_inputs, lower_obs, std::unique_ptr<CovarianceFunction>(new SquaredExponential()));
+    upper_gp = GaussianProcess(upper_inputs, upper_obs, std::unique_ptr<CovarianceFunction>(new SquaredExponential()));
+    // Perform gradients
+    double epsilon = std::pow(10, -6);
+    rProp(lower_gp, lower_gp.getParametersGuess(), lower_gp.getParametersStep(), lower_gp.getParametersLimits(),
+          epsilon);
+    rProp(upper_gp, upper_gp.getParametersGuess(), upper_gp.getParametersStep(), upper_gp.getParametersLimits(),
+          epsilon);
+  }
 
   double split;
   GaussianProcess lower_gp;
   GaussianProcess upper_gp;
 };
 
-void getDistribParameters(const Eigen::VectorXd & input,
-                          std::vector<MultiGP> & multi_gps,
-                          double & mean,
-                          double & var)
+void getDistribParameters(const Eigen::VectorXd& input, std::vector<MultiGP>& multi_gps, double& mean, double& var)
 {
   int nb_predictors = multi_gps.size();
   Eigen::VectorXd means(nb_predictors);
@@ -82,10 +78,11 @@ void getDistribParameters(const Eigen::VectorXd & input,
   // Compute values for each predictor
   for (size_t i = 0; i < multi_gps.size(); i++)
   {
-    MultiGP & gps = multi_gps[i];
+    MultiGP& gps = multi_gps[i];
     // Choose appropriate gp
-    GaussianProcess * gp = &gps.lower_gp;
-    if (input(0) > gps.split) gp = &gps.upper_gp;
+    GaussianProcess* gp = &gps.lower_gp;
+    if (input(0) > gps.split)
+      gp = &gps.upper_gp;
     // compute values
     double tmp_mean, tmp_var;
     gp->getDistribParameters(input, tmp_mean, tmp_var);
@@ -108,43 +105,39 @@ int main()
   auto engine = rhoban_random::getRandomEngine();
 
   // Setting problem properties
-  Eigen::MatrixXd limits(1,2);
-  limits(0,0) = -8;
-  limits(0,1) = 8;
+  Eigen::MatrixXd limits(1, 2);
+  limits(0, 0) = -8;
+  limits(0, 1) = 8;
   int nb_samples = 50;
   int nb_prediction_points = 1000;
   int nb_predictors = 100;
 
-//  std::function<double(const Eigen::VectorXd &)> f =
-//    [](const Eigen::VectorXd & input)
-//    {
-//      return std::fabs(input(0));
-//    };
-  std::function<double(const Eigen::VectorXd &)> f =
-    [](const Eigen::VectorXd & input)
-    {
-      if (input(0) > 0) return 1;
-      return -1;
-    };
-//  std::function<double(const Eigen::VectorXd &)> f =
-//    [](const Eigen::VectorXd & input)
-//    {
-//      return sin(input(0));
-//    };
+  //  std::function<double(const Eigen::VectorXd &)> f =
+  //    [](const Eigen::VectorXd & input)
+  //    {
+  //      return std::fabs(input(0));
+  //    };
+  std::function<double(const Eigen::VectorXd&)> f = [](const Eigen::VectorXd& input) {
+    if (input(0) > 0)
+      return 1;
+    return -1;
+  };
+  //  std::function<double(const Eigen::VectorXd &)> f =
+  //    [](const Eigen::VectorXd & input)
+  //    {
+  //      return sin(input(0));
+  //    };
 
   // Generating random input
   Eigen::MatrixXd samples = rhoban_random::getUniformSamplesMatrix(limits, nb_samples, &engine);
 
   // Generating output
   Eigen::VectorXd observations = rhoban_gp::generateObservations(samples, f, 0.05, &engine);
-  
+
   // Generating random splits
   double min_input = samples.minCoeff();
   double max_input = samples.maxCoeff();
-  std::vector<double> splits = rhoban_random::getUniformSamples(min_input,
-                                                                max_input,
-                                                                nb_predictors,
-                                                                &engine);
+  std::vector<double> splits = rhoban_random::getUniformSamples(min_input, max_input, nb_predictors, &engine);
   // Generate all the MultiGP
   std::vector<MultiGP> multi_gps;
   for (double split : splits)
@@ -152,7 +145,7 @@ int main()
     multi_gps.push_back(MultiGP(samples, observations, split));
   }
 
-   // Writing predictions + points
+  // Writing predictions + points
   std::ofstream out;
   out.open("randomized_gp_predictions.csv");
   out << "type,input,mean,min,max" << std::endl;
@@ -161,17 +154,17 @@ int main()
   for (int i = 0; i < samples.cols(); i++)
   {
     // write with the same format but min and max carry no meaning
-    out << "observation," << samples(0,i) << "," << observations(i) << ",0,0" << std::endl;
+    out << "observation," << samples(0, i) << "," << observations(i) << ",0,0" << std::endl;
   }
-  
+
   // Writing predictions
   for (int point = 0; point < nb_prediction_points; point++)
   {
     // Computing input
-    double delta = limits(0,1) - limits(0,0);
-    double x = limits(0,0) + delta * point / nb_prediction_points;
+    double delta = limits(0, 1) - limits(0, 0);
+    double x = limits(0, 0) + delta * point / nb_prediction_points;
     Eigen::VectorXd prediction_input(1);
-    prediction_input(0) = x; 
+    prediction_input(0) = x;
     // Retrieving distrib parameters
     double mean, var;
     getDistribParameters(prediction_input, multi_gps, mean, var);
@@ -180,11 +173,8 @@ int main()
     double min = mean - interval;
     double max = mean + interval;
     // Writing line
-    out << "prediction," << x << ","
-        << mean << "," << min << "," << max << std::endl;
+    out << "prediction," << x << "," << mean << "," << min << "," << max << std::endl;
   }
 
   out.close();
-
-
 }

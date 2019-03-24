@@ -17,11 +17,11 @@ using namespace rhoban_gp;
 int main()
 {
   // Setting problem properties
-  Eigen::MatrixXd limits(1,2);
-  limits(0,0) = -8;
-  limits(0,1) = 8;
+  Eigen::MatrixXd limits(1, 2);
+  limits(0, 0) = -8;
+  limits(0, 1) = 8;
   // Parameters
-  int nb_points = 50;// Points used to sample function
+  int nb_points = 50;  // Points used to sample function
   int nb_prediction_points = 1000;
   double length_scale = 1;
   double sn = 0.1;
@@ -39,7 +39,7 @@ int main()
   generative_gp.setMeasurementNoise(sn);
   Eigen::VectorXd observations = generative_gp.generateValues(inputs, engine, true);
   // tmp override
-  //observations = generateObservations(inputs, [](double x)
+  // observations = generateObservations(inputs, [](double x)
   //                                    {
   //                                      return
   //                                      0.01 * x * x * x * x
@@ -48,18 +48,18 @@ int main()
   //                                      +  3 * x
   //                                      - 2;
   //                                    }, 0.05);
-  observations = generateObservations(inputs, [](double x)
-                                      {
-                                        if (x > 2) return 1;
+  observations = generateObservations(inputs,
+                                      [](double x) {
+                                        if (x > 2)
+                                          return 1;
                                         return -1;
-                                      }, 0.05);
+                                      },
+                                      0.05);
 
-  GaussianProcess gp(inputs, observations,
-                     std::unique_ptr<CovarianceFunction>(new SquaredExponential()));
+  GaussianProcess gp(inputs, observations, std::unique_ptr<CovarianceFunction>(new SquaredExponential()));
   // Gradient ascent
   double epsilon = std::pow(10, -6);
-  rProp(gp, gp.getParametersGuess(), gp.getParametersStep(),
-        gp.getParametersLimits(), epsilon);
+  rProp(gp, gp.getParametersGuess(), gp.getParametersStep(), gp.getParametersLimits(), epsilon);
 
   // Writing predictions + points
   std::ofstream out;
@@ -70,17 +70,17 @@ int main()
   for (int i = 0; i < inputs.cols(); i++)
   {
     // write with the same format but min and max carry no meaning
-    out << "observation," << inputs(0,i) << "," << observations(i) << ",0,0" << std::endl;
+    out << "observation," << inputs(0, i) << "," << observations(i) << ",0,0" << std::endl;
   }
-  
+
   // Writing predictions
   for (int point = 0; point < nb_prediction_points; point++)
   {
     // Computing input
-    double delta = limits(0,1) - limits(0,0);
-    double x = limits(0,0) + delta * point / nb_prediction_points;
+    double delta = limits(0, 1) - limits(0, 0);
+    double x = limits(0, 0) + delta * point / nb_prediction_points;
     Eigen::VectorXd prediction_input(1);
-    prediction_input(0) = x; 
+    prediction_input(0) = x;
     // Retrieving distrib parameters
     double mean, var;
     gp.getDistribParameters(prediction_input, mean, var);
@@ -89,10 +89,8 @@ int main()
     double min = mean - interval;
     double max = mean + interval;
     // Writing line
-    out << "prediction," << x << ","
-        << mean << "," << min << "," << max << std::endl;
+    out << "prediction," << x << "," << mean << "," << min << "," << max << std::endl;
   }
 
   out.close();
-
 }

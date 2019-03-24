@@ -6,21 +6,14 @@
 
 namespace rhoban_gp
 {
-
 CovarianceFunctionFactory::CovarianceFunctionFactory()
 {
-  registerBuilder(CovarianceFunction::SquaredExponential, []()
-                  {
-                    return std::unique_ptr<CovarianceFunction>(new SquaredExponential);
-                  });
-  registerBuilder(CovarianceFunction::NeuralNetwork, []()
-                  {
-                    return std::unique_ptr<CovarianceFunction>(new NeuralNetwork);
-                  });
-  registerBuilder(CovarianceFunction::NeuralNetwork2, []()
-                  {
-                    return std::unique_ptr<CovarianceFunction>(new NeuralNetwork2);
-                  });
+  registerBuilder(CovarianceFunction::SquaredExponential,
+                  []() { return std::unique_ptr<CovarianceFunction>(new SquaredExponential); });
+  registerBuilder(CovarianceFunction::NeuralNetwork,
+                  []() { return std::unique_ptr<CovarianceFunction>(new NeuralNetwork); });
+  registerBuilder(CovarianceFunction::NeuralNetwork2,
+                  []() { return std::unique_ptr<CovarianceFunction>(new NeuralNetwork2); });
 }
 
-}
+}  // namespace rhoban_gp

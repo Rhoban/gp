@@ -29,10 +29,10 @@ int main()
 
   // Generating inputs
   std::uniform_real_distribution<double> input_distrib(x_min, x_max);
-  Eigen::MatrixXd inputs(1,nb_test_points);
+  Eigen::MatrixXd inputs(1, nb_test_points);
   for (int p = 0; p < nb_test_points; p++)
   {
-    inputs(0,p) = input_distrib(engine);
+    inputs(0, p) = input_distrib(engine);
   }
 
   // Generating noisy observations
@@ -42,9 +42,9 @@ int main()
   Eigen::VectorXd observations = generative_gp.generateValues(inputs, engine, true);
 
   // Evaluation parameters
-  std::vector<double> l_values  = {1  , 0.3    , 3   }; // Length-scale
-  std::vector<double> sf_values = {1  , 1.08   , 1.16}; // Signal stddev
-  std::vector<double> sn_values = {0.1, 0.00005, 0.89}; // Noise stddev
+  std::vector<double> l_values = { 1, 0.3, 3 };            // Length-scale
+  std::vector<double> sf_values = { 1, 1.08, 1.16 };       // Signal stddev
+  std::vector<double> sn_values = { 0.1, 0.00005, 0.89 };  // Noise stddev
 
   // Generating prediction inputs
   Eigen::MatrixXd prediction_inputs(1, nb_prediction_points);
@@ -52,17 +52,17 @@ int main()
   double x_step = (x_max - x_min) / nb_prediction_points;
   for (int i = 0; i < nb_prediction_points; i++)
   {
-    prediction_inputs(0,i) = x;
+    prediction_inputs(0, i) = x;
     x += x_step;
   }
   for (size_t i = 0; i < l_values.size(); i++)
   {
     // Reading hyperparameters
-    double l  = l_values[i];
+    double l = l_values[i];
     double sf = sf_values[i];
     double sn = sn_values[i];
     // Creating GP with appropriate parameters
-    std::unique_ptr<CovarianceFunction> covar_func(new SquaredExponential(l,sf));
+    std::unique_ptr<CovarianceFunction> covar_func(new SquaredExponential(l, sf));
     GaussianProcess gp(inputs, observations, std::move(covar_func));
     gp.setMeasurementNoise(sn);
     // Computing file path
@@ -77,7 +77,7 @@ int main()
     for (int i = 0; i < inputs.cols(); i++)
     {
       // write with the same format but min and max carry no meaning
-      out << "observation," << inputs(0,i) << "," << observations(i) << ",0,0" << std::endl;
+      out << "observation," << inputs(0, i) << "," << observations(i) << ",0,0" << std::endl;
     }
     // Writing predictions
     for (int i = 0; i < nb_prediction_points; i++)
@@ -87,8 +87,7 @@ int main()
       double interval = 2 * std::sqrt(var);
       double min = mean - interval;
       double max = mean + interval;
-      out << "prediction," << prediction_inputs(0,i) << ","
-          << mean << "," << min << "," << max << std::endl;
+      out << "prediction," << prediction_inputs(0, i) << "," << mean << "," << min << "," << max << std::endl;
     }
     // Close output file
     out.close();

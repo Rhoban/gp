@@ -21,7 +21,7 @@ int main()
   double x_min = -8;
   double x_max = 8;
   // Parameters
-  std::vector<int> nb_points_vec = {8,21,55};
+  std::vector<int> nb_points_vec = { 8, 21, 55 };
   double length_scale = 1;
   double sn = 0.1;
   double sf = 1;
@@ -35,13 +35,12 @@ int main()
 
   for (int nb_points : nb_points_vec)
   {
-
     // Generating inputs
     std::uniform_real_distribution<double> input_distrib(x_min, x_max);
-    Eigen::MatrixXd inputs(1,nb_points);
+    Eigen::MatrixXd inputs(1, nb_points);
     for (int p = 0; p < nb_points; p++)
     {
-      inputs(0,p) = input_distrib(engine);
+      inputs(0, p) = input_distrib(engine);
     }
 
     // Generating noisy observations
@@ -54,11 +53,11 @@ int main()
     // Generating data
     int nb_plot_points = 1000;
     double min_l_exp = -5;
-    double max_l_exp =  1;
+    double max_l_exp = 1;
     for (int point = 0; point < nb_plot_points; point++)
     {
       double delta = max_l_exp - min_l_exp;
-      double exp = min_l_exp + delta *  point / nb_plot_points;
+      double exp = min_l_exp + delta * point / nb_plot_points;
       double l = std::pow(10, exp);
       // Create GP with the given parameter
       std::unique_ptr<CovarianceFunction> f(new SquaredExponential(l, sf));
@@ -68,8 +67,8 @@ int main()
       double log_marginal_likelihood = gp.getLogMarginalLikelihood();
       Eigen::VectorXd gradient = gp.getMarginalLikelihoodGradient();
 
-      out << nb_points << "," << l << "," << log_marginal_likelihood << ","
-          << gradient(0) << "," << gradient(1) << "," << gradient(2) << std::endl;
+      out << nb_points << "," << l << "," << log_marginal_likelihood << "," << gradient(0) << "," << gradient(1) << ","
+          << gradient(2) << std::endl;
     }
   }
 

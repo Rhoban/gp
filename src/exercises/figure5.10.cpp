@@ -36,19 +36,23 @@ int main()
   // Generating input
   Eigen::MatrixXd inputs(1, nb_points);
   Eigen::VectorXd observations(nb_points);
-  for (int p = 0; p < nb_points; p++) {
+  for (int p = 0; p < nb_points; p++)
+  {
     double x = x_distrib(engine);
     double y = 1;
-    if (x < 0) { y = -1; }
+    if (x < 0)
+    {
+      y = -1;
+    }
     y += noise_distrib(engine);
     out << "observation," << x << "," << y << ",0,0" << std::endl;
-    inputs(0,p) = x;
+    inputs(0, p) = x;
     observations(p) = y;
   }
 
   // Training GP
-  //std::unique_ptr<CovarianceFunction> covar_func(new SquaredExponential());
-  //std::unique_ptr<CovarianceFunction> covar_func(new NeuralNetwork());
+  // std::unique_ptr<CovarianceFunction> covar_func(new SquaredExponential());
+  // std::unique_ptr<CovarianceFunction> covar_func(new NeuralNetwork());
   std::unique_ptr<CovarianceFunction> covar_func(new NeuralNetwork2());
   GaussianProcess gp(inputs, observations, std::move(covar_func));
   RandomizedRProp::Config ga_conf;
@@ -56,9 +60,9 @@ int main()
   ga_conf.rprop_conf->max_iterations = 100;
   ga_conf.rprop_conf->tuning_space = RProp::TuningSpace::Log;
   gp.autoTune(ga_conf);
-  //Eigen::VectorXd manual_parameters(3);
-  //manual_parameters << 0.1, 100, 100;
-  //gp.setParameters(manual_parameters);
+  // Eigen::VectorXd manual_parameters(3);
+  // manual_parameters << 0.1, 100, 100;
+  // gp.setParameters(manual_parameters);
 
   // Writing predictions
   for (int i = 0; i < nb_prediction_points; i++)
@@ -71,8 +75,7 @@ int main()
     double interval = 2 * std::sqrt(var);
     double min = mean - interval;
     double max = mean + interval;
-    out << "prediction," << x << ","
-        << mean << "," << min << "," << max << std::endl;
+    out << "prediction," << x << "," << mean << "," << min << "," << max << std::endl;
   }
 
   std::cout << "Log marginal likelihood: " << gp.getLogMarginalLikelihood() << std::endl;

@@ -5,8 +5,8 @@
 #include "rhoban_random/multivariate_gaussian.h"
 
 #include <Eigen/Cholesky>
-#include <Eigen/LU>       // Required for inverse computation
-#include <Eigen/SVD>      // Required for jacobiSVD
+#include <Eigen/LU>   // Required for inverse computation
+#include <Eigen/SVD>  // Required for jacobiSVD
 
 #include <iostream>
 #include <sstream>
@@ -16,17 +16,11 @@ using rhoban_random::MultivariateGaussian;
 
 namespace rhoban_gp
 {
-
-GaussianProcess::GaussianProcess()
-  : dirty_cov(false),
-    dirty_inv(false),
-    dirty_cholesky(false),
-    dirty_alpha(false)
+GaussianProcess::GaussianProcess() : dirty_cov(false), dirty_inv(false), dirty_cholesky(false), dirty_alpha(false)
 {
 }
 
-GaussianProcess::GaussianProcess(const Eigen::MatrixXd & inputs_,
-                                 const Eigen::VectorXd & observations_,
+GaussianProcess::GaussianProcess(const Eigen::MatrixXd& inputs_, const Eigen::VectorXd& observations_,
                                  std::unique_ptr<CovarianceFunction> covar_func_)
   : GaussianProcess()
 {
@@ -36,19 +30,19 @@ GaussianProcess::GaussianProcess(const Eigen::MatrixXd & inputs_,
   setDirty();
 }
 
-GaussianProcess::GaussianProcess(const GaussianProcess & other)
-  : covar_func(std::unique_ptr<CovarianceFunction>(other.covar_func->clone())),
-    measurement_noise(other.measurement_noise),
-    inputs(other.inputs),
-    observations(other.observations),
-    cov(other.cov),
-    inv_cov(other.inv_cov),
-    cholesky(other.cholesky),
-    alpha(other.alpha),
-    dirty_cov(other.dirty_cov),
-    dirty_inv(other.dirty_inv),
-    dirty_cholesky(other.dirty_cholesky),
-    dirty_alpha(other.dirty_alpha)
+GaussianProcess::GaussianProcess(const GaussianProcess& other)
+  : covar_func(std::unique_ptr<CovarianceFunction>(other.covar_func->clone()))
+  , measurement_noise(other.measurement_noise)
+  , inputs(other.inputs)
+  , observations(other.observations)
+  , cov(other.cov)
+  , inv_cov(other.inv_cov)
+  , cholesky(other.cholesky)
+  , alpha(other.alpha)
+  , dirty_cov(other.dirty_cov)
+  , dirty_inv(other.dirty_inv)
+  , dirty_cholesky(other.dirty_cholesky)
+  , dirty_alpha(other.dirty_alpha)
 {
 }
 
@@ -69,24 +63,24 @@ GaussianProcess& GaussianProcess::operator=(const GaussianProcess& other)
   return *this;
 }
 
-void GaussianProcess::setParameters(const Eigen::VectorXd & parameters)
+void GaussianProcess::setParameters(const Eigen::VectorXd& parameters)
 {
   int nb_parameters = 1 + getCovarFunc().getNbParameters();
   if (parameters.rows() != nb_parameters)
   {
     std::ostringstream oss;
-    oss << "GaussianProcess::setParameters: " << parameters.rows()
-        << " parameters received, while expecting " << nb_parameters << " parameters";
+    oss << "GaussianProcess::setParameters: " << parameters.rows() << " parameters received, while expecting "
+        << nb_parameters << " parameters";
     throw std::runtime_error(oss.str());
   }
   measurement_noise = parameters(0);
-  covar_func->setParameters(parameters.segment(1, nb_parameters -1));
+  covar_func->setParameters(parameters.segment(1, nb_parameters - 1));
   setDirty();
 }
 
 Eigen::VectorXd GaussianProcess::getParameters() const
 {
-  const CovarianceFunction & f = getCovarFunc();
+  const CovarianceFunction& f = getCovarFunc();
   Eigen::VectorXd parameters(1 + f.getNbParameters());
   parameters(0) = measurement_noise;
   parameters.segment(1, f.getNbParameters()) = f.getParameters();
@@ -95,7 +89,7 @@ Eigen::VectorXd GaussianProcess::getParameters() const
 
 Eigen::VectorXd GaussianProcess::getParametersGuess() const
 {
-  const CovarianceFunction & f = getCovarFunc();
+  const CovarianceFunction& f = getCovarFunc();
   Eigen::VectorXd guess(1 + f.getNbParameters());
   guess(0) = 1;
   guess.segment(1, f.getNbParameters()) = f.getParametersGuess();
@@ -104,26 +98,26 @@ Eigen::VectorXd GaussianProcess::getParametersGuess() const
 
 Eigen::VectorXd GaussianProcess::getParametersStep() const
 {
-  const CovarianceFunction & f = getCovarFunc();
+  const CovarianceFunction& f = getCovarFunc();
   Eigen::VectorXd step(1 + f.getNbParameters());
   // Since this value has an impact, its default value should be chosen automatically
-  step(0) = std::pow(10,-5);
+  step(0) = std::pow(10, -5);
   step.segment(1, f.getNbParameters()) = f.getParametersStep();
   return step;
 }
 
 Eigen::MatrixXd GaussianProcess::getParametersLimits() const
 {
-  const CovarianceFunction & f = getCovarFunc();
+  const CovarianceFunction& f = getCovarFunc();
   // If noise is either too high or too low, there are numerical issues resulting with nans and inf
   Eigen::MatrixXd limits(1 + f.getNbParameters(), 2);
-  limits(0,0) = std::pow(10,-10);
-  limits(0,1) = std::pow(10,10);
-  limits.block(1,0, f.getNbParameters(), 2) = f.getParametersLimits();
+  limits(0, 0) = std::pow(10, -10);
+  limits(0, 1) = std::pow(10, 10);
+  limits.block(1, 0, f.getNbParameters(), 2) = f.getParametersLimits();
   return limits;
 }
 
-const CovarianceFunction & GaussianProcess::getCovarFunc() const
+const CovarianceFunction& GaussianProcess::getCovarFunc() const
 {
   if (!covar_func)
     throw std::runtime_error("GaussianProcess::getCovarFunc(): covar_func is not defined");
@@ -142,44 +136,45 @@ void GaussianProcess::setMeasurementNoise(double noise_stddev)
   setDirty();
 }
 
-double GaussianProcess::getPrediction(const Eigen::VectorXd & point)
+double GaussianProcess::getPrediction(const Eigen::VectorXd& point)
 {
   double mean, var;
   getDistribParameters(point, mean, var);
   return mean;
 }
 
-double GaussianProcess::getPrediction(const Eigen::VectorXd & point) const
+double GaussianProcess::getPrediction(const Eigen::VectorXd& point) const
 {
   double mean, var;
   getDistribParameters(point, mean, var);
   return mean;
 }
 
-double GaussianProcess::getVariance(const Eigen::VectorXd & point)
+double GaussianProcess::getVariance(const Eigen::VectorXd& point)
 {
   double mean, var;
   getDistribParameters(point, mean, var);
   return var;
 }
 
-double GaussianProcess::getVariance(const Eigen::VectorXd & point) const
+double GaussianProcess::getVariance(const Eigen::VectorXd& point) const
 {
   double mean, var;
   getDistribParameters(point, mean, var);
   return var;
 }
 
-Eigen::VectorXd GaussianProcess::getGradient(const Eigen::VectorXd & point)
+Eigen::VectorXd GaussianProcess::getGradient(const Eigen::VectorXd& point)
 {
   updateAlpha();
   Eigen::MatrixXd covarfunc_grad = covar_func->computeInputGradient(point, inputs);
   return covarfunc_grad * alpha;
 }
 
-Eigen::VectorXd GaussianProcess::getGradient(const Eigen::VectorXd & point) const
+Eigen::VectorXd GaussianProcess::getGradient(const Eigen::VectorXd& point) const
 {
-  if (dirty_alpha) {
+  if (dirty_alpha)
+  {
     throw std::runtime_error("GaussianProcess::getGradient: precomputations missing");
   }
   Eigen::MatrixXd covarfunc_grad = covar_func->computeInputGradient(point, inputs);
@@ -187,21 +182,17 @@ Eigen::VectorXd GaussianProcess::getGradient(const Eigen::VectorXd & point) cons
 }
 
 // Uses Algorithm 2.1 from Rasmussen 2006 (page 19)
-void GaussianProcess::getDistribParameters(const Eigen::VectorXd & point,
-                                           double & mean,
-                                           double & var)
+void GaussianProcess::getDistribParameters(const Eigen::VectorXd& point, double& mean, double& var)
 {
   // Line 2
   updateCholesky();
   // Line 3
   updateAlpha();
   // Use the const version since necessary content has been updated
-  ((const GaussianProcess *)this)->getDistribParameters(point, mean, var);
+  ((const GaussianProcess*)this)->getDistribParameters(point, mean, var);
 }
 
-void GaussianProcess::getDistribParameters(const Eigen::VectorXd & point,
-                                           double & mean,
-                                           double & var) const
+void GaussianProcess::getDistribParameters(const Eigen::VectorXd& point, double& mean, double& var) const
 {
   // Precomputations
   Eigen::VectorXd k_star = getCovarFunc().buildMatrix(inputs, point);
@@ -210,7 +201,8 @@ void GaussianProcess::getDistribParameters(const Eigen::VectorXd & point,
   point_cov += std::pow(measurement_noise, 2);
 
   // Check that line 2 and 3 have been computed or throw error
-  if (dirty_cholesky || dirty_alpha) {
+  if (dirty_cholesky || dirty_alpha)
+  {
     throw std::runtime_error("GaussianProcess::getDistribParameters: precomputations missing");
   }
 
@@ -224,9 +216,7 @@ void GaussianProcess::getDistribParameters(const Eigen::VectorXd & point,
 
 // TODO: check if it is possible to use Cholesky instead
 //       (problems to use the 'solve' since k_star is not a vector)
-void GaussianProcess::getDistribParameters(const Eigen::MatrixXd & points,
-                                           Eigen::VectorXd & mu,
-                                           Eigen::MatrixXd & sigma)
+void GaussianProcess::getDistribParameters(const Eigen::MatrixXd& points, Eigen::VectorXd& mu, Eigen::MatrixXd& sigma)
 {
   // Precomputations
   Eigen::MatrixXd k_star = getCovarFunc().buildMatrix(inputs, points);
@@ -245,22 +235,19 @@ void GaussianProcess::getDistribParameters(const Eigen::MatrixXd & points,
     throw std::logic_error("Unexpected dimension for mu");
   }
 
-  mu = tmp_mu. col(0);
+  mu = tmp_mu.col(0);
   sigma = points_cov - k_star_t * inv_cov * k_star;
 }
 
-
-Eigen::VectorXd
-GaussianProcess::generateValues(const Eigen::MatrixXd & requested_inputs,
-                                std::default_random_engine & engine,
-                                bool add_measurement_noise)
+Eigen::VectorXd GaussianProcess::generateValues(const Eigen::MatrixXd& requested_inputs,
+                                                std::default_random_engine& engine, bool add_measurement_noise)
 {
   Eigen::VectorXd mu;
   Eigen::MatrixXd sigma;
 
   getDistribParameters(requested_inputs, mu, sigma);
 
-  MultivariateGaussian distrib(mu,sigma);
+  MultivariateGaussian distrib(mu, sigma);
 
   Eigen::VectorXd values = distrib.getSample(&engine);
 
@@ -281,11 +268,12 @@ double GaussianProcess::getLogMarginalLikelihood()
 {
   updateCholesky();
   updateAlpha();
-  
+
   // compute second term
   double det = cholesky.diagonal().array().log().sum();
 
-  if (std::isnan(det)) {
+  if (std::isnan(det))
+  {
     std::cout << "Find a nan value for determinant of cholesky!" << std::endl;
     std::cout << cholesky << std::endl;
     std::cout << "Parameters: " << getParameters().transpose() << std::endl;
@@ -307,15 +295,18 @@ Eigen::VectorXd GaussianProcess::getMarginalLikelihoodGradient()
 
   // Since we compute the trace: Each couple i, j of the matrix with i < j  is counted twice
   int size = weights.cols();
-  for(int row = 0; row < size; row++) {
-    for (int col = 0; col < row; col++) {
+  for (int row = 0; row < size; row++)
+  {
+    for (int col = 0; col < row; col++)
+    {
       Eigen::VectorXd tmp_grad = getCovarFunc().computeGradient(inputs.col(row), inputs.col(col));
       // measurement noise has no effect if row != col
       gradient.segment(1, gradient_dim - 1) += tmp_grad * weights(row, col);
     }
   }
   // Since we compute the trace: Each couple i, j of the matrix with i == j  is counted once
-  for(int i = 0; i < size; i++) {
+  for (int i = 0; i < size; i++)
+  {
     Eigen::VectorXd tmp_grad = getCovarFunc().computeGradient(inputs.col(i), inputs.col(i));
     // measurement_noise is squared, therefore, dev is 2x
     gradient(0) += measurement_noise * weights(i, i);
@@ -332,31 +323,26 @@ void GaussianProcess::updateInternal()
   updateCholesky();
 }
 
-void GaussianProcess::autoTune(const RandomizedRProp::Config & conf)
+void GaussianProcess::autoTune(const RandomizedRProp::Config& conf)
 {
   // Prepare gradient and score functions
   std::function<Eigen::VectorXd(const Eigen::VectorXd)> gradient_func;
   std::function<double(const Eigen::VectorXd)> score_func;
-  gradient_func = [this](const Eigen::VectorXd & guess)
-    {
-      this->setParameters(guess);
-      return this->getMarginalLikelihoodGradient();
-    };
-  score_func = [this](const Eigen::VectorXd & guess)
-    {
-      this->setParameters(guess);
-      return this->getLogMarginalLikelihood();
-    };
+  gradient_func = [this](const Eigen::VectorXd& guess) {
+    this->setParameters(guess);
+    return this->getMarginalLikelihoodGradient();
+  };
+  score_func = [this](const Eigen::VectorXd& guess) {
+    this->setParameters(guess);
+    return this->getLogMarginalLikelihood();
+  };
   // Use randomized Rprop
-  Eigen::VectorXd best_guess = RandomizedRProp::run(gradient_func,
-                                                    score_func,
-                                                    getParametersLimits(),
-                                                    conf);
+  Eigen::VectorXd best_guess = RandomizedRProp::run(gradient_func, score_func, getParametersLimits(), conf);
   setParameters(best_guess);
   updateInternal();
 }
 
-int GaussianProcess::write(std::ostream & out) const
+int GaussianProcess::write(std::ostream& out) const
 {
   int bytes_written = 0;
   // Getting important values
@@ -367,26 +353,20 @@ int GaussianProcess::write(std::ostream & out) const
   bytes_written += rhoban_utils::writeInt(out, input_dim);
   bytes_written += rhoban_utils::writeInt(out, nb_samples);
   // Write the inputs and observations
-  bytes_written += rhoban_utils::writeDoubleArray(out, inputs.data(),
-                                                  input_dim * nb_samples);
-  bytes_written += rhoban_utils::writeDoubleArray(out, observations.data(),
-                                                  nb_samples);
+  bytes_written += rhoban_utils::writeDoubleArray(out, inputs.data(), input_dim * nb_samples);
+  bytes_written += rhoban_utils::writeDoubleArray(out, observations.data(), nb_samples);
   // Write the internal matrices
-  bytes_written += rhoban_utils::writeDoubleArray(out, cov.data(),
-                                                  nb_samples2);
-  bytes_written += rhoban_utils::writeDoubleArray(out, inv_cov.data(),
-                                                  nb_samples2);
-  bytes_written += rhoban_utils::writeDoubleArray(out, cholesky.data(),
-                                                  nb_samples2);
-  bytes_written += rhoban_utils::writeDoubleArray(out, alpha.data(),
-                                                  nb_samples);
+  bytes_written += rhoban_utils::writeDoubleArray(out, cov.data(), nb_samples2);
+  bytes_written += rhoban_utils::writeDoubleArray(out, inv_cov.data(), nb_samples2);
+  bytes_written += rhoban_utils::writeDoubleArray(out, cholesky.data(), nb_samples2);
+  bytes_written += rhoban_utils::writeDoubleArray(out, alpha.data(), nb_samples);
   // Write the measurement_noise and covariance function
   bytes_written += rhoban_utils::write<double>(out, measurement_noise);
   bytes_written += covar_func->write(out);
   return bytes_written;
 }
 
-int GaussianProcess::read(std::istream & in)
+int GaussianProcess::read(std::istream& in)
 {
   int bytes_read = 0;
   // Variables used through the process
@@ -397,27 +377,21 @@ int GaussianProcess::read(std::istream & in)
   nb_samples2 = nb_samples * nb_samples;
   // Getting inputs and observations
   inputs = Eigen::MatrixXd::Zero(input_dim, nb_samples);
-  bytes_read += rhoban_utils::readDoubleArray(in, inputs.data(),
-                                              input_dim * nb_samples);
+  bytes_read += rhoban_utils::readDoubleArray(in, inputs.data(), input_dim * nb_samples);
   observations = Eigen::VectorXd::Zero(nb_samples);
-  bytes_read += rhoban_utils::readDoubleArray(in, observations.data(),
-                                              nb_samples);
+  bytes_read += rhoban_utils::readDoubleArray(in, observations.data(), nb_samples);
   // Read internal matrices
-  cov      = Eigen::MatrixXd::Zero(nb_samples, nb_samples);
-  inv_cov  = Eigen::MatrixXd::Zero(nb_samples, nb_samples);
+  cov = Eigen::MatrixXd::Zero(nb_samples, nb_samples);
+  inv_cov = Eigen::MatrixXd::Zero(nb_samples, nb_samples);
   cholesky = Eigen::MatrixXd::Zero(nb_samples, nb_samples);
-  alpha    = Eigen::VectorXd::Zero(nb_samples);
-  bytes_read += rhoban_utils::readDoubleArray(in, cov.data(),
-                                              nb_samples2);
-  bytes_read += rhoban_utils::readDoubleArray(in, inv_cov.data(),
-                                              nb_samples2);
-  bytes_read += rhoban_utils::readDoubleArray(in, cholesky.data(),
-                                              nb_samples2);
-  bytes_read += rhoban_utils::readDoubleArray(in, alpha.data(),
-                                              nb_samples);
+  alpha = Eigen::VectorXd::Zero(nb_samples);
+  bytes_read += rhoban_utils::readDoubleArray(in, cov.data(), nb_samples2);
+  bytes_read += rhoban_utils::readDoubleArray(in, inv_cov.data(), nb_samples2);
+  bytes_read += rhoban_utils::readDoubleArray(in, cholesky.data(), nb_samples2);
+  bytes_read += rhoban_utils::readDoubleArray(in, alpha.data(), nb_samples);
   dirty_cov = false;
   dirty_inv = false;
-  dirty_cholesky=false;
+  dirty_cholesky = false;
   dirty_alpha = false;
   // Read measurement_noise and covariance function and its parameters
   bytes_read += rhoban_utils::read<double>(in, &measurement_noise);
@@ -427,11 +401,12 @@ int GaussianProcess::read(std::istream & in)
 
 void GaussianProcess::updateCov()
 {
-  if (!dirty_cov) return;
+  if (!dirty_cov)
+    return;
 
   cov = getCovarFunc().buildMatrix(inputs);
 
-  double epsilon = std::pow(measurement_noise,2);
+  double epsilon = std::pow(measurement_noise, 2);
   // minimal noise is required for numerical stability (cf Rasmussen2006: page 201)
   epsilon = std::max(epsilon, std::pow(10, -10));
   Eigen::MatrixXd I = Eigen::MatrixXd::Identity(cov.rows(), cov.rows());
@@ -440,7 +415,8 @@ void GaussianProcess::updateCov()
 
 void GaussianProcess::updateInverse()
 {
-  if (!dirty_inv) return;
+  if (!dirty_inv)
+    return;
 
   updateCov();
 
@@ -450,7 +426,8 @@ void GaussianProcess::updateInverse()
 
 void GaussianProcess::updateCholesky()
 {
-  if (!dirty_cholesky) return;
+  if (!dirty_cholesky)
+    return;
 
   updateCov();
 
@@ -460,7 +437,8 @@ void GaussianProcess::updateCholesky()
 
 void GaussianProcess::updateAlpha()
 {
-  if (!dirty_alpha) return;
+  if (!dirty_alpha)
+    return;
 
   updateCholesky();
 
@@ -480,4 +458,4 @@ void GaussianProcess::setDirty()
   dirty_alpha = true;
 }
 
-}
+}  // namespace rhoban_gp

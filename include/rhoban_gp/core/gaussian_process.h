@@ -11,23 +11,21 @@
 
 namespace rhoban_gp
 {
-
 class GaussianProcess
 {
 public:
   GaussianProcess();
 
-  GaussianProcess(const Eigen::MatrixXd & inputs,
-                  const Eigen::VectorXd & observations,
+  GaussianProcess(const Eigen::MatrixXd& inputs, const Eigen::VectorXd& observations,
                   std::unique_ptr<CovarianceFunction> covar_func);
   // Enabling copy of GaussianProcess
-  GaussianProcess(const GaussianProcess & other);
+  GaussianProcess(const GaussianProcess& other);
   // Allowing left affectation
-  GaussianProcess & operator=(const GaussianProcess & other);
+  GaussianProcess& operator=(const GaussianProcess& other);
 
   /// Set the parameters for measurement noise and covariance function
   /// Order is as follows: [measurement_noise, covar_parameters]
-  void setParameters(const Eigen::VectorXd & parameters);
+  void setParameters(const Eigen::VectorXd& parameters);
 
   /// Return current values for the parameters
   Eigen::VectorXd getParameters() const;
@@ -41,7 +39,7 @@ public:
 
   /// Since modifying the CovarianceFunction requires to set the flags to dirty,
   /// access is const only.
-  const CovarianceFunction & getCovarFunc() const;
+  const CovarianceFunction& getCovarFunc() const;
 
   /// Update the covariance function
   void setCovarFunc(std::unique_ptr<CovarianceFunction> f);
@@ -50,41 +48,34 @@ public:
   void setMeasurementNoise(double noise_stddev);
 
   /// Return a prediction of the value at the given point
-  double getPrediction(const Eigen::VectorXd & point);
-  /// Throw an error if some parameters are dirty 
-  double getPrediction(const Eigen::VectorXd & point) const;
+  double getPrediction(const Eigen::VectorXd& point);
+  /// Throw an error if some parameters are dirty
+  double getPrediction(const Eigen::VectorXd& point) const;
   /// Return an estimation of the variance at the given point
-  double getVariance(const Eigen::VectorXd & point);
-  /// Throw an error if some parameters are dirty 
-  double getVariance(const Eigen::VectorXd & point) const;
+  double getVariance(const Eigen::VectorXd& point);
+  /// Throw an error if some parameters are dirty
+  double getVariance(const Eigen::VectorXd& point) const;
 
   /// Return the predicted gradient at the given point
-  Eigen::VectorXd getGradient(const Eigen::VectorXd & point);
-  /// Throw an error if some parameters are dirty 
-  Eigen::VectorXd getGradient(const Eigen::VectorXd & point) const;
+  Eigen::VectorXd getGradient(const Eigen::VectorXd& point);
+  /// Throw an error if some parameters are dirty
+  Eigen::VectorXd getGradient(const Eigen::VectorXd& point) const;
 
   /// Compute the parameters of the distribution at the given point and
   /// update the 'mean' and 'var' values accordingly
-  void getDistribParameters(const Eigen::VectorXd & point,
-                            double & mean,
-                            double & var);
-  /// Throw an error if some parameters are dirty 
-  void getDistribParameters(const Eigen::VectorXd & point,
-                            double & mean,
-                            double & var) const;
+  void getDistribParameters(const Eigen::VectorXd& point, double& mean, double& var);
+  /// Throw an error if some parameters are dirty
+  void getDistribParameters(const Eigen::VectorXd& point, double& mean, double& var) const;
 
   /// Compute the parameters of the multivariate distribution for the given points
-  void getDistribParameters(const Eigen::MatrixXd & points,
-                            Eigen::VectorXd & mu,
-                            Eigen::MatrixXd & sigma);
+  void getDistribParameters(const Eigen::MatrixXd& points, Eigen::VectorXd& mu, Eigen::MatrixXd& sigma);
 
   /// Generate the outputs of a random function using the requested inputs
   /// While in the requested Inputs, each column is a different input,
   /// In the result, each row is a different output
   /// If add measurement noise is chosen, then an independent measurement noise
   /// with the provided standard deviation is applied on each measurement
-  Eigen::VectorXd generateValues(const Eigen::MatrixXd & requested_inputs,
-                                 std::default_random_engine & engine,
+  Eigen::VectorXd generateValues(const Eigen::MatrixXd& requested_inputs, std::default_random_engine& engine,
                                  bool add_measurement_noise = false);
 
   /// Compute the log likelihood of the current distribution
@@ -100,13 +91,13 @@ public:
 
   /// Search the best parameters for fitting using randomized RProp with the
   /// provided configuration
-  void autoTune(const RandomizedRProp::Config & conf);
+  void autoTune(const RandomizedRProp::Config& conf);
 
   /// Return the number of bytes written in the stream
-  int write(std::ostream & out) const;
+  int write(std::ostream& out) const;
 
   /// Return the number of bytes read from the stream
-  int read(std::istream & in);
+  int read(std::istream& in);
 
 private:
   /// Update the covariance matrix if required
@@ -152,4 +143,4 @@ private:
   bool dirty_alpha;
 };
 
-}
+}  // namespace rhoban_gp

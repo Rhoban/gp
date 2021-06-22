@@ -1,4 +1,4 @@
 deps:
-  - rhoban/random
-  - rhoban/utils
+  - rhoban/random#wks
+  - rhoban/utils#wks
 

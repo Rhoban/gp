@@ -1,23 +1,7 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.16.3)
 project(rhoban_gp)
 
-find_package(catkin REQUIRED
-  rhoban_random
-  rhoban_utils
-  )
-
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
-
-catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES rhoban_gp
-  CATKIN_DEPENDS rhoban_random rhoban_utils
-)
-
-include_directories(
-  include
-  ${catkin_INCLUDE_DIRS}
-)
 
 option(ROSBAN_GP_BUILD_EXPERIMENTS "Building experiments binary" OFF)
 
@@ -35,14 +19,18 @@ add_library(rhoban_gp
   src/rhoban_gp/core/neural_network2.cpp
   src/rhoban_gp/core/squared_exponential.cpp
 )
-target_link_libraries(rhoban_gp ${catkin_LIBRARIES})
+target_link_libraries(rhoban_gp PUBLIC rhoban_random rhoban_utils)
+target_link_libraries(rhoban_gp PUBLIC rhoban_random rhoban_utils)
+target_include_directories(rhoban_gp PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
 
 if(ROSBAN_GP_BUILD_EXPERIMENTS)
   add_executable(2.9.1 src/exercises/2.9.1.cpp)
-  target_link_libraries(2.9.1 rhoban_gp ${catkin_LIBRARIES})
+  target_link_libraries(2.9.1 rhoban_gp)
   
   add_executable(figure2.5 src/exercises/figure2.5.cpp)
-  target_link_libraries(figure2.5 rhoban_gp ${catkin_LIBRARIES})
+  target_link_libraries(figure2.5 rhoban_gp)
   
   add_executable(figure4.5b src/exercises/figure4.5b.cpp)
   target_link_libraries(figure4.5b rhoban_gp ${catkin_LIBRARIES})
